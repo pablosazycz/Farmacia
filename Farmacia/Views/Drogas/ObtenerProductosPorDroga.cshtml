@@ -1,0 +1,50 @@
+﻿@model IEnumerable<Farmacia.Models.Producto>
+
+@{
+    ViewData["Title"] = "Lista Productos por Droga";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>@ViewData["Title"]</h1>
+<h3>@ViewData["Droga"]</h3>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+
+            <th>@Html.DisplayNameFor(model => model.NombreComercial)</th>
+            <th>@Html.DisplayNameFor(model => model.CantidadPresentacion)</th>
+            <th> @Html.DisplayNameFor(model => model.CodigoBarras)</th>
+            <th>
+                @Html.DisplayNameFor(model => model.Activo)
+            </th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (Producto item in Model)
+            {
+                <tr>
+
+                    <td>@Html.DisplayFor(modelItem => item.NombreComercial)</td>
+                    <td>@Html.DisplayFor(modelItem => item.CantidadPresentacion)</td>
+                    <td>@Html.DisplayFor(modelItem => item.CodigoBarras)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Activo)</td>
+                    <td>
+                        <a asp-controller="Productos" asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Detalles</a>
+                        <a asp-controller="Productos" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Editar</a>
+                        <a asp-controller="Productos" asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Eliminar</a>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="5" class="text-center">No hay productos disponibles.</td>
+            </tr>
+        }
+    </tbody>
+</table>
