@@ -6,7 +6,12 @@
 
 <h2>@ViewData["Title"]</h2>
 
-<table class="table table-bordered table-striped">
+<div class="btn-group" role="group" aria-label="Basic example">
+    <a type="button" class="btn btn-primary" asp-controller="MovimientoStock" asp-action="CrearCompra">Ingresar Mercaderia</a>
+    <a type="button" class="btn btn-primary" asp-controller="MovimientoStock" asp-action="CrearVenta" >Generar Venta</a>
+</div>
+
+<table class="table table-bordered table-striped" id="example">
     <thead>
         <tr>
             <th>Fecha</th>
@@ -40,3 +45,17 @@
     }
     </tbody>
 </table>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#example').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                },
+                pageLength: 10,
+                order: [[0, 'desc']] // Ordena por la columna Fecha de forma descendente
+            });
+        });
+    </script>
+}

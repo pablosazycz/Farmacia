@@ -49,8 +49,8 @@ namespace Farmacia.Controllers
             return View();
         }
 
-        // GET: MovimientoStock/Create
-        public async Task<IActionResult> Create()
+        // GET: MovimientoStock/CrearCompra
+        public async Task<IActionResult> CrearCompra()
         {
             IList<Droga> drogas = await _drogaService.ObtenerDrogasAsync();
 
@@ -74,7 +74,7 @@ namespace Farmacia.Controllers
         // POST: MovimientoStock/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(MovimientoStock movimiento)
+        public async Task<IActionResult> CrearCompra(MovimientoStock movimiento)
         {
             movimiento.UsuarioId = _userManager.GetUserId(User);
 
@@ -82,6 +82,38 @@ namespace Farmacia.Controllers
             {
                 movimiento.Fecha = DateTime.Now;
                 movimiento.TipoMovimiento = TipoMovimiento.Compra;
+
+                await _movimientoStockService.CrearMovimientoAsync(movimiento);
+                return RedirectToAction("Index");
+            }
+
+            ViewBag.Drogas = new SelectList(await _drogaService.ObtenerDrogasAsync(), "Id", "NombreCompleto");
+            return View(movimiento);
+        }
+
+
+        public async Task<IActionResult> CrearVenta()
+        {
+            IList<Droga> drogas = await _drogaService.ObtenerDrogasAsync();
+
+
+            ViewBag.Drogas = new SelectList(drogas, "Id", "NombreCompleto");
+
+            return View();
+        }
+
+     
+        // POST: MovimientoStock/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CrearVenta(MovimientoStock movimiento)
+        {
+            movimiento.UsuarioId = _userManager.GetUserId(User);
+
+            if (ModelState.IsValid)
+            {
+                movimiento.Fecha = DateTime.Now;
+                movimiento.TipoMovimiento = TipoMovimiento.Venta;
 
                 await _movimientoStockService.CrearMovimientoAsync(movimiento);
                 return RedirectToAction("Index");
