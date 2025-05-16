@@ -1,0 +1,80 @@
+﻿@model MovimientoStock
+
+@{
+    ViewData["Title"] = "Ingreso de Mercadería";
+}
+
+<h2>Ingreso de Mercadería</h2>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label for="DrogaId">Droga</label>
+        <select id="DrogaId" name="DrogaId" class="form-control" required>
+            <option value="">Seleccione una droga</option>
+            @foreach (var droga in (IEnumerable<SelectListItem>)ViewBag.Drogas)
+            {
+                <option value="@droga.Value">@droga.Text</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="ProductoId">Producto</label>
+        <select id="ProductoId" name="ProductoId" class="form-control" required>
+            <option value="">Seleccione un producto</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="Cantidad">Cantidad</label>
+        <input type="number" name="Cantidad" class="form-control" required min="1" />
+    </div>
+
+    <div class="form-group">
+        <label for="CodigoLote">Código de Lote</label>
+        <input type="text" name="CodigoLote" class="form-control" required />
+    </div>
+
+    <div class="form-group">
+        <label for="Observaciones">Observaciones</label>
+        <textarea name="Observaciones" class="form-control"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</form>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#DrogaId').change(function () {
+                var drogaId = $(this).val();
+                var $productoSelect = $('#ProductoId');
+                $productoSelect.empty();
+
+                if (drogaId) {
+                    $.ajax({
+                        url: '/MovimientoStock/ObtenerProductosPorDroga',
+                        type: 'GET',
+                        data: { drogaId: drogaId },
+                        success: function (response) {
+                            if (response.success) {
+                                $productoSelect.append($('<option>').val('').text('Seleccione un producto'));
+                                $.each(response.productos, function (i, producto) {
+                                    $productoSelect.append($('<option>').val(producto.id).text(producto.nombreComercial));
+                                });
+                            } else {
+                                alert(response.message || 'No se encontraron productos.');
+                            }
+                        },
+                        error: function () {
+                            alert('Error al cargar productos.');
+                        }
+                    });
+                } else {
+                    $productoSelect.append($('<option>').val('').text('Seleccione una droga primero'));
+                }
+            });
+        });
+    </script>
+}

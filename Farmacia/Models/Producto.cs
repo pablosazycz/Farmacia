@@ -39,3 +39,5 @@ namespace Farmacia.Models
 
     }
 }
+
+//TODO: Agreegar en la presentacion si es caja blister o como viene para que quede mejor en el nombre

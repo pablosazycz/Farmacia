@@ -68,13 +68,13 @@ namespace Farmacia.Services
                 .ToListAsync();
         }
 
-        public async Task<List<Producto>> ObtenerProductosPorDrogaAsync(int drogaId)
-        {
-            return await _context.Productos
-              .Where(p => p.DrogaId == drogaId && p.Activo)
-              .Include(p => p.Droga)
-              .ToListAsync();
-        }
+            public async Task<List<Producto>> ObtenerProductosPorDrogaAsync(int drogaId)
+            {
+                return await _context.Productos
+                  .Where(p => p.DrogaId == drogaId && p.Activo)
+              
+                  .ToListAsync();
+            }
 
         public async Task<List<Producto>> ObtenerProductosPorNombreAsync(string nombre)
         {

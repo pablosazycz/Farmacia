@@ -1,0 +1,42 @@
+﻿@model IEnumerable<Farmacia.Models.MovimientoStock>
+
+@{
+    ViewData["Title"] = "Movimientos de Stock";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Droga</th>
+            <th>Producto</th>
+            <th>Presentacion</th>
+            <th>Cantidad</th>
+            <th>Usuario</th>
+            <th>Código Lote</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+            <td>@item.TipoMovimiento.ToString()</td>
+            <td>@item.Droga?.NombreCompleto</td>
+            <td>@item.Producto.NombreComercial</td>
+            <td>@item.Producto.CantidadPresentacion</td>
+            <td>@item.Cantidad</td>
+            <td>@item.Usuario?.UserName</td>
+            <td>@item.CodigoLote</td>
+            <td>
+                @* Acciones como editar o ver detalle, opcional *@
+                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Detalles</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

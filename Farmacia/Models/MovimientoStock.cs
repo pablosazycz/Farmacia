@@ -25,7 +25,7 @@ namespace Farmacia.Models
         [StringLength(500, ErrorMessage = "Las observaciones no pueden superar los 500 caracteres.")]
         public string Observaciones { get; set; }
 
-        [Required]
+
         public string UsuarioId { get; set; }
 
         [ForeignKey("UsuarioId")]
@@ -39,7 +39,9 @@ namespace Farmacia.Models
         [Required]
         public string CodigoLote { get; set; }
 
-     
+        public int? LoteId { get; set; } // Puede ser nullable si en algunos casos no hay lote
+
+        [ForeignKey("LoteId")]
         public Lote Lote { get; set; }
     }
 
