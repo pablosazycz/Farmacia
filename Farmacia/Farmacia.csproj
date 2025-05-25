@@ -8,12 +8,27 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\fonts\Handel Becker Bold.ttf" />
+    <Content Remove="wwwroot\fonts\Handel Gothic D Medium.ttf" />
+    <Content Remove="wwwroot\fonts\Handel Gothic EF Bold.ttf" />
+    <Content Remove="wwwroot\fonts\Handel Gothic.ttf" />
+    <Content Remove="wwwroot\fonts\HandelGo.ttf" />
+    <Content Remove="wwwroot\fonts\HandelGothic Regular.ttf" />
+    <Content Remove="wwwroot\fonts\HandelGothic TL Kirillica.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.15" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.15" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.15" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.15" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.15" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\img\" />
   </ItemGroup>
 
 </Project>
