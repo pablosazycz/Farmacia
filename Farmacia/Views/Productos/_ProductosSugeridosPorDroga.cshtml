@@ -1,0 +1,30 @@
+﻿@model List<Farmacia.Models.Producto>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Presentación</th>
+            <th>Precio</th>
+            <th>Vencimiento más cercano</th>
+            <th>Seleccionar</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var prod in Model)
+        {
+            var fechaVto = prod.Lotes?.OrderBy(l => l.FechaVencimiento).FirstOrDefault()?.FechaVencimiento;
+
+            <tr>
+                <td>@prod.NombreComercial</td>
+                <td>@prod.PresentacionCompleta</td>
+                <td>@prod.PrecioUnitario.ToString("C")</td>
+                <td>@(fechaVto?.ToShortDateString() ?? "N/A")</td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-success" onclick="seleccionarProductoDesdeSugerencia(@prod.Id, '@prod.NombreComercial @prod.PresentacionCompleta', @prod.PrecioUnitario.ToString(System.Globalization.CultureInfo.InvariantCulture))">Seleccionar</button>
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>

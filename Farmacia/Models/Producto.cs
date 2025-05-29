@@ -16,8 +16,14 @@ namespace Farmacia.Models
         [Required]
         [Display(Name = "Form Farm")]
         public string FormaFarmaceutica { get; set; }
+
+        [Required]
+        [Display(Name = "Tipo de Presentación")]
+        public TipoPresentacionEnum TipoPresentacion { get; set; }
+
         [Display(Name = "Presentacion")]
         public int CantidadPresentacion { get; set; }
+
         [Display(Name = "EAN")]
         public string CodigoBarras { get; set; }
 
@@ -37,7 +43,38 @@ namespace Farmacia.Models
 
         public ICollection<Lote> Lotes { get; set; }
 
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal PrecioUnitario { get; set; }
+
+        [NotMapped]
+        public string PresentacionCompleta
+        {
+            get
+            {
+                return $"{TipoPresentacion.ToString()} X {CantidadPresentacion} {FormaFarmaceutica?.ToString()}(s)";
+            }
+        }
+
     }
+
+    public enum TipoPresentacionEnum
+    {
+        Caja,
+        Blister,
+        Frasco,
+        Sachet,
+        Ampolla,
+        Tubo
+    }
+
+    public enum EstadoEnum
+    {
+        Activo,
+        Inactivo,
+        Descontinuado
+    }
+
+
 }
 
 //TODO: Agreegar en la presentacion si es caja blister o como viene para que quede mejor en el nombre

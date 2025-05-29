@@ -13,5 +13,6 @@ namespace Farmacia.Interfaces
         Task<List<Producto>> ObtenerProductosPorNombreAsync(string nombre);
         Task<List<Producto>> ObtenerProductosPorDrogaAsync(int drogaId);
         Task<List<Producto>> ObtenerProductosActivosAsync();
+        Task<List<Producto>> ObtenerProductosPorDrogaOrdenadosPorVencimientoAsync(int drogaId);
     }
 }

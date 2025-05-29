@@ -39,6 +39,9 @@ namespace Farmacia.Models
         [Required]
         public string CodigoLote { get; set; }
 
+        [NotMapped]
+        public DateTime FechaVencimiento { get; set; }
+
         public int? LoteId { get; set; } // Puede ser nullable si en algunos casos no hay lote
 
         [ForeignKey("LoteId")]

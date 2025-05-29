@@ -135,6 +135,18 @@ namespace Farmacia.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        
+        [HttpGet]
+        public async Task<IActionResult> ProductosPorDroga(int id)
+        {
+            try
+            {
+                var productosRelacionados = await _productoService.ObtenerProductosPorDrogaOrdenadosPorVencimientoAsync(id);
+                return PartialView("_ProductosSugeridosPorDroga", productosRelacionados);
+            }
+            catch (Exception ex)
+            {
+                return Content("Error: " + ex.Message);
+            }
+        }
     }
 }

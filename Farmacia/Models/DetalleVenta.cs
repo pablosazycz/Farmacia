@@ -20,6 +20,7 @@ namespace Farmacia.Models
 
         public decimal PrecioUnitario { get; set; }
 
+
         public decimal Subtotal => Cantidad * PrecioUnitario;
     }
 

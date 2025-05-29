@@ -6,7 +6,7 @@
 
 <h2>Ingreso de Mercadería</h2>
 
-<form asp-action="Create" method="post">
+<form asp-action="CrearCompra" method="post">
     <div class="form-group">
         <label for="DrogaId">Droga</label>
         <select id="DrogaId" name="DrogaId" class="form-control" required>
@@ -33,6 +33,18 @@
     <div class="form-group">
         <label for="CodigoLote">Código de Lote</label>
         <input type="text" name="CodigoLote" class="form-control" required />
+    </div>
+
+
+    <div class="form-group">
+        <label for="FechaVencimiento">Fecha Vencimiento</label>
+         <input type="date" name="FechaVencimiento" class="form-control" required /> 
+      
+    </div>
+
+    <div class="form-group">
+        <label for="PrecioCompra">Precio de Compra</label>
+        <input type="number" step="0.01" min="0" name="PrecioCompra" class="form-control" required />
     </div>
 
     <div class="form-group">

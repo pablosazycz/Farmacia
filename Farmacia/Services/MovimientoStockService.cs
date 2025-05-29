@@ -164,7 +164,7 @@ namespace Farmacia.Services
                         var nuevoLote = new Lote
                         {
                             CodigoLote = movimiento.CodigoLote,
-                            FechaVencimiento = movimiento.Fecha,
+                            FechaVencimiento = movimiento.FechaVencimiento,
                             Cantidad = movimiento.Cantidad,
                             ProductoId = (int)movimiento.ProductoId
                         };
@@ -214,7 +214,7 @@ namespace Farmacia.Services
 
             return movimiento;
         }
-
+            
 
         public async Task<List<MovimientoStock>> ObtenerMovimientosPorDrogaIdAsync(int drogaId)
         {

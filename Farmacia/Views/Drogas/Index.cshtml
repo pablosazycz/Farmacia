@@ -4,12 +4,12 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Drogas Genericas</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<table class="table">
+<table class="table" id="example">
     <thead>
         <tr>
             <th>
@@ -74,12 +74,28 @@
                     @Html.DisplayFor(modelItem => item.FechaBaja)
                 </td>
                 <td>
-                    <a asp-action="ObtenerProductosPorDroga" asp-route-id="@item.Id" class="btn btn-outline-info btn-sm"> Productos Rel</a>
+                    <div class="btn-group-vertical" role="group" aria-label="Vertical radio toggle button group">
+                    <a asp-action="ObtenerProductosPorDroga" asp-route-id="@item.Id" class="btn btn-outline-info btn-sm">Productos</a>
                     <a asp-controller="Drogas" asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info btn-sm">Detalles</a>
                     <a asp-controller="Drogas" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning btn-sm">Editar</a>
                     <a asp-controller="Drogas" asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger btn-sm">Eliminar</a>
+                    </div>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#example').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                },
+                pageLength: 10,
+                order: [[0, 'desc']] // Ordena por la columna Fecha de forma descendente
+            });
+        });
+    </script>
+}

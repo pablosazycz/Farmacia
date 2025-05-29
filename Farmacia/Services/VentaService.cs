@@ -8,11 +8,13 @@ namespace Farmacia.Services
 
     public class VentaService : IVentaService
     {
-        private readonly ApplicationDbContext _context;
 
-        public VentaService(ApplicationDbContext context)
+        private readonly ApplicationDbContext _context;
+        private readonly IMovimientoStockService _movimientoService;
+        public VentaService(ApplicationDbContext context, IMovimientoStockService movimientoService)
         {
             _context = context;
+            _movimientoService = movimientoService;
         }
 
 
@@ -26,9 +28,61 @@ namespace Farmacia.Services
             throw new NotImplementedException();
         }
 
-        public Task<Venta> CrearVentaAsync(Venta venta)
+
+        public async Task<Venta> CrearVentaAsync(Venta venta)
         {
-            throw new NotImplementedException();
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                venta.Fecha = DateTime.Now;
+                venta.Total = venta.DetallesVenta.Sum(d => d.Subtotal);
+
+                _context.Ventas.Add(venta);
+                await _context.SaveChangesAsync();
+
+                foreach (var detalle in venta.DetallesVenta)
+                {
+
+                    var movimiento = new MovimientoStock
+                    {
+                        ProductoId = detalle.ProductoId,
+                        DrogaId = await ObtenerDrogaIdPorProducto(detalle.ProductoId),
+                        Cantidad = detalle.Cantidad,
+                        CodigoLote = await ObtenerLoteDisponible(detalle.ProductoId, detalle.Cantidad),
+                        TipoMovimiento = TipoMovimiento.Venta,
+                        UsuarioId = venta.UsuarioId
+                    };
+
+                    await _movimientoService.CrearMovimientoAsync(movimiento);
+                }
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return venta;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+
+        private async Task<int> ObtenerDrogaIdPorProducto(int productoId)
+        {
+            var producto = await _context.Productos.FindAsync(productoId);
+            return producto?.DrogaId ?? throw new Exception("Producto no encontrado");
+        }
+
+        private async Task<string> ObtenerLoteDisponible(int productoId, int cantidad)
+        {
+            var lote = await _context.Lotes
+                .Where(l => l.ProductoId == productoId && l.Cantidad >= cantidad)
+                .OrderBy(l => l.FechaVencimiento)
+                .FirstOrDefaultAsync();
+
+            return lote?.CodigoLote ?? throw new Exception("No hay stock suficiente para el producto.");
         }
 
         public Task<bool> EliminarVentaAsync(int id)
