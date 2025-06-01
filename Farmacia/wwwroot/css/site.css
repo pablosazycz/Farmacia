@@ -1,3 +1,8 @@
+@font-face {
+    font-family: 'HandelGotic';
+    src: url('../fonts/OPTIHandelGothic-Light.otf') format('truetype')
+}
+
 html {
   font-size: 14px;
 }
@@ -18,5 +23,9 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+    font-family: 'Handel Gothic', sans-serif;
+    font-weight: 100;
+    font-style: normal;
+    margin-bottom: 60px
 }
+
