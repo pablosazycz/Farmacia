@@ -107,5 +107,25 @@ namespace Farmacia.Services
 
             await _context.SaveChangesAsync();
         }
+
+        public async Task<List<Lote>> ObtenerLotesProximosAVencerAsync(int dias)
+        {
+            var hoy = DateTime.Today;
+            var fechaLimite = hoy.AddDays(dias);
+            return await _context.Lotes
+                .Where(l => l.FechaVencimiento > hoy && l.FechaVencimiento <= fechaLimite && l.Cantidad > 0)
+                .Include(l => l.Producto)
+                .ToListAsync();
+        }
+
+        public async Task<List<Lote>> ObtenerLotesVencidosAsync()
+        {
+            var hoy = DateTime.Today;
+
+            return await _context.Lotes
+                .Where(l => l.FechaVencimiento < hoy && l.Cantidad > 0)
+                .Include(l => l.Producto)
+                .ToListAsync();
+        }
     }
 }
