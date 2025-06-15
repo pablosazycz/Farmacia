@@ -1,0 +1,32 @@
+@page
+@model Farmacia.Areas.Identity.Pages.Admin.ManageUsersModel
+@{
+    ViewData["Title"] = "Gestión de Usuarios";
+}
+
+<h2>Gestión de Usuarios</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>Roles</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var user in Model.Users)
+    {
+        <tr>
+            <td>@user.Email</td>
+            <td>@string.Join(", ", user.Roles)</td>
+            <td>
+                <a asp-page="/Admin/ManageRoles" asp-route-userId="@user.Id" class="btn btn-sm btn-primary">Gestionar Roles</a>
+                <!-- Aquí puedes agregar más acciones, como eliminar usuario -->
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<a asp-page="/Home/Index" class="btn btn-secondary">Volver</a>

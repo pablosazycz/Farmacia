@@ -7,6 +7,7 @@
         <thead>
             <tr>
                 <th>Medicamento</th>
+                <th>Lote</th>
                 <th>Fecha de Vencimiento</th>
             </tr>
         </thead>
@@ -15,6 +16,7 @@
         {
             <tr>
                 <td>@lote?.Producto?.NombreComercial</td>
+                <td>@lote?.CodigoLote</td>
                 <td>@lote?.FechaVencimiento.ToString("dd/MM/yyyy")</td>
             </tr>
         }

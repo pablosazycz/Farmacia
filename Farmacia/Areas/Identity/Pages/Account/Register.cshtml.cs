@@ -120,6 +120,9 @@ namespace Farmacia.Areas.Identity.Pages.Account
 
                 if (result.Succeeded)
                 {
+                    // Asigna el rol "Empleado" al nuevo usuario
+                    await _userManager.AddToRoleAsync(user, "Empleado");
+
                     _logger.LogInformation("User created a new account with password.");
 
                     var userId = await _userManager.GetUserIdAsync(user);
