@@ -1,0 +1,48 @@
+﻿@model IEnumerable<Farmacia.Models.Cliente>
+
+<h2>Clientes</h2>
+<a asp-action="Create" class="btn btn-primary">Nuevo Cliente</a>
+
+<table class="table table-striped" id="example">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>DNI</th>
+            <th>Teléfono</th>
+            <th>Email</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var cliente in Model)
+        {
+            <tr>
+                <td>@cliente.Nombre</td>
+                <td>@cliente.Apellido</td>
+                <td>@cliente.Dni</td>
+                <td>@cliente.Telefono</td>
+                <td>@cliente.Email</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@cliente.Id">Editar</a> |
+                    <a asp-action="Details" asp-route-id="@cliente.Id">Detalles</a> |
+                    <a asp-action="Delete" asp-route-id="@cliente.Id">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#example').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                },
+                pageLength: 10,
+                order: [[0, 'desc']] // Ordena por la columna Fecha de forma descendente
+            });
+        });
+    </script>
+}

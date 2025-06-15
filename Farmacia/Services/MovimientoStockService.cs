@@ -10,20 +10,17 @@ namespace Farmacia.Services
     {
         private readonly IDrogaService _drogaService;
         private readonly IProductoService _productoService;
-        private readonly ILoteService _loteService;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _UserManager;
 
         public MovimientoStockService(
             IDrogaService drogaService,
             IProductoService productoService,
-            ILoteService loteService,
             ApplicationDbContext context,
             UserManager<IdentityUser> userManager)
         {
             _drogaService = drogaService;
             _productoService = productoService;
-            _loteService = loteService;
             _context = context;
             userManager = _UserManager;
 
@@ -166,10 +163,18 @@ namespace Farmacia.Services
                             CodigoLote = movimiento.CodigoLote,
                             FechaVencimiento = movimiento.FechaVencimiento,
                             Cantidad = movimiento.Cantidad,
-                            ProductoId = (int)movimiento.ProductoId
+                            ProductoId = (int)movimiento.ProductoId,
+                            PrecioCompra=movimiento.Lote.PrecioCompra
                         };
                         _context.Lotes.Add(nuevoLote);
                         await _context.SaveChangesAsync(); // para obtener el Id
+
+                        decimal porcentajeGanancia = 0.30m; // 30%
+                        producto.PrecioUnitario = Math.Round(nuevoLote.PrecioCompra * (1 + porcentajeGanancia), 2);
+                        if (movimiento.Lote.PrecioCompra <= 0)
+                            throw new ArgumentException("El precio de compra debe ser mayor a cero.");
+                        _context.Productos.Update(producto);
+                        await _context.SaveChangesAsync();
 
                         movimiento.Lote = nuevoLote;
                         movimiento.LoteId = nuevoLote.Id;
@@ -204,6 +209,22 @@ namespace Farmacia.Services
                     _context.Drogas.Update(droga);
                     break;
 
+                case TipoMovimiento.BajaPorVencimiento:
+
+                    if (loteExistente == null)
+                        throw new ArgumentException("El lote especificado no existe para dar de baja por vencimiento.");
+                    if (loteExistente.FechaVencimiento >= DateTime.Now)
+                        throw new ArgumentException("El lote no está vencido.");
+                    if (loteExistente.Cantidad < movimiento.Cantidad)
+                        throw new ArgumentException("No hay suficiente cantidad en el lote para dar de baja por vencimiento.");
+                    loteExistente.Cantidad -= movimiento.Cantidad;
+                    _context.Lotes.Update(loteExistente);
+                    movimiento.Lote = loteExistente;
+                    movimiento.LoteId = loteExistente.Id;
+                    int unidadesBaja = movimiento.Cantidad * producto.CantidadPresentacion;
+                    droga.Stock -= unidadesBaja;
+                    _context.Drogas.Update(droga);
+                    break;
 
                 default:
                     throw new ArgumentException("Tipo de movimiento inválido.");

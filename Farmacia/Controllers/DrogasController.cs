@@ -140,6 +140,7 @@ namespace Farmacia.Controllers
             List<Producto> productos = await _productoService.ObtenerProductosPorDrogaAsync(id);
             Droga droga = await _drogaService.ObtenerDrogaPorIdAsync(id);
             ViewData["Droga"] = droga.NombreCompleto;
+
             if (productos == null)
             {
                 return NotFound();

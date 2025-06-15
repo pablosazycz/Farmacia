@@ -11,16 +11,143 @@ namespace Farmacia.Services
 
         private readonly ApplicationDbContext _context;
         private readonly IMovimientoStockService _movimientoService;
-        public VentaService(ApplicationDbContext context, IMovimientoStockService movimientoService)
+        private readonly IClienteService _clienteService;
+
+        public VentaService(ApplicationDbContext context, IMovimientoStockService movimientoService, IClienteService clienteService)
         {
             _context = context;
             _movimientoService = movimientoService;
+            _clienteService = clienteService;
         }
 
 
-        public Task<Venta> ActualizarVentaAsync(Venta venta)
+        public async Task<Venta> ActualizarVentaAsync(Venta venta)
         {
-            throw new NotImplementedException();
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            var ventaExistente = await _context.Ventas
+                .Include(v => v.DetallesVenta)
+                .Include(v => v.Cliente)
+                .FirstOrDefaultAsync(v => v.Id == venta.Id);
+
+            if (ventaExistente == null)
+                throw new Exception("Venta no encontrada");
+
+            // 1. Revertir movimientos de stock anteriores (devolver stock)
+            var movimientosAnteriores = await _context.MovimientosStock
+                .Where(m => m.TipoMovimiento == TipoMovimiento.Venta && m.VentaId == ventaExistente.Id)
+                .ToListAsync();
+
+            foreach (var mov in movimientosAnteriores)
+            {
+                // Devuelve stock al lote y a la droga
+                var lote = await _context.Lotes.FirstOrDefaultAsync(l => l.CodigoLote == mov.CodigoLote && l.ProductoId == mov.ProductoId);
+                if (lote != null)
+                    lote.Cantidad += mov.Cantidad;
+
+                var producto = await _context.Productos.FindAsync(mov.ProductoId);
+                if (producto != null)
+                {
+                    var droga = await _context.Drogas.FindAsync(producto.DrogaId);
+                    if (droga != null)
+                        droga.Stock += mov.Cantidad * producto.CantidadPresentacion;
+                }
+            }
+            _context.MovimientosStock.RemoveRange(movimientosAnteriores);
+
+            // 2. Actualizar cliente
+            ventaExistente.ClienteId = venta.ClienteId;
+
+            // 3. Actualizar detalles
+            // Eliminar detalles que ya no están
+            var detallesAEliminar = ventaExistente.DetallesVenta
+                .Where(d => !venta.DetallesVenta.Any(nd => nd.Id == d.Id))
+                .ToList();
+            _context.DetallesVenta.RemoveRange(detallesAEliminar);
+
+            // Actualizar o agregar detalles
+            foreach (var detalleNuevo in venta.DetallesVenta)
+            {
+                var detalleExistente = ventaExistente.DetallesVenta.FirstOrDefault(d => d.Id == detalleNuevo.Id);
+                if (detalleExistente != null)
+                {
+                    detalleExistente.ProductoId = detalleNuevo.ProductoId;
+                    detalleExistente.Cantidad = detalleNuevo.Cantidad;
+                    detalleExistente.PrecioUnitario = detalleNuevo.PrecioUnitario;
+                    detalleExistente.Subtotal = detalleNuevo.Subtotal;
+                }
+                else
+                {
+                    detalleNuevo.VentaId = ventaExistente.Id;
+                    _context.DetallesVenta.Add(detalleNuevo);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            // 4. Validar stock y crear nuevos movimientos de stock
+            var detallesActualizados = await _context.DetallesVenta
+                .Where(d => d.VentaId == ventaExistente.Id)
+                .ToListAsync();
+
+            foreach (var detalle in detallesActualizados)
+            {
+                // Validar stock disponible
+                var loteCodigo = await ObtenerLoteDisponible(detalle.ProductoId, detalle.Cantidad);
+                var producto = await _context.Productos.FindAsync(detalle.ProductoId);
+                if (producto == null)
+                    throw new Exception("Producto no encontrado");
+
+                var droga = await _context.Drogas.FindAsync(producto.DrogaId);
+                if (droga == null)
+                    throw new Exception("Droga no encontrada");
+
+                var lote = await _context.Lotes.FirstOrDefaultAsync(l => l.CodigoLote == loteCodigo && l.ProductoId == detalle.ProductoId);
+                if (lote == null || lote.Cantidad < detalle.Cantidad)
+                    throw new Exception("No hay stock suficiente para el producto.");
+
+                // Descontar stock
+                lote.Cantidad -= detalle.Cantidad;
+                droga.Stock -= detalle.Cantidad * producto.CantidadPresentacion;
+
+                // Registrar movimiento de stock
+                var movimiento = new MovimientoStock
+                {
+                    ProductoId = detalle.ProductoId,
+                    DrogaId = producto.DrogaId,
+                    Cantidad = detalle.Cantidad,
+                    CodigoLote = loteCodigo,
+                    TipoMovimiento = TipoMovimiento.Venta,
+                    UsuarioId = ventaExistente.UsuarioId,
+                    Fecha = DateTime.Now,
+                    VentaId = ventaExistente.Id
+                };
+                _context.MovimientosStock.Add(movimiento);
+            }
+
+            // 5. Recalcular total y descuento
+            ventaExistente.Total = detallesActualizados.Sum(d => d.Subtotal);
+
+            // Recalcular descuento si hay promoción aplicada
+            var promoAplicada = await _context.ClientePromociones
+                .Include(cp => cp.Promocion)
+                .FirstOrDefaultAsync(cp => cp.VentaId == ventaExistente.Id);
+
+            if (promoAplicada != null && promoAplicada.Promocion != null && promoAplicada.Promocion.Descuento > 0)
+            {
+                var descuento = ventaExistente.Total * promoAplicada.Promocion.Descuento;
+                ventaExistente.DescuentoAplicado = descuento;
+                ventaExistente.Total -= descuento;
+            }
+            else
+            {
+                ventaExistente.DescuentoAplicado = 0;
+            }
+
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            return ventaExistente;
         }
 
         public Task<bool> AplicarPromocionAsync(ClientePromocion clientePromocion)
@@ -29,7 +156,7 @@ namespace Farmacia.Services
         }
 
 
-        public async Task<Venta> CrearVentaAsync(Venta venta)
+        public async Task<Venta> CrearVentaAsync(Venta venta, int? promocionId = null)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
 
@@ -38,12 +165,42 @@ namespace Farmacia.Services
                 venta.Fecha = DateTime.Now;
                 venta.Total = venta.DetallesVenta.Sum(d => d.Subtotal);
 
+                // Aplica promoción si corresponde (calcula descuento antes de guardar la venta)
+                if (promocionId.HasValue)
+                {
+                    var promo = await _context.Promociones.FindAsync(promocionId.Value);
+                    if (promo != null && promo.Activa)
+                    {
+                        // Si promo.Descuento es 10 para 10%, divide por 100m
+                        var descuento = venta.Total * (promo.Descuento / 100m);
+                        venta.DescuentoAplicado = descuento;
+                        venta.Total -= descuento;
+                    }
+                }
+
                 _context.Ventas.Add(venta);
                 await _context.SaveChangesAsync();
 
+                // Ahora que la venta tiene Id, registra la relación con la promoción
+                if (promocionId.HasValue)
+                {
+                    var promo = await _context.Promociones.FindAsync(promocionId.Value);
+                    if (promo != null && promo.Activa)
+                    {
+                        var clientePromocion = new ClientePromocion
+                        {
+                            ClienteId = venta.ClienteId,
+                            PromocionId = promo.Id,
+                            FechaAplicacion = DateTime.Now,
+                            VentaId = venta.Id
+                        };
+                        _context.ClientePromociones.Add(clientePromocion);
+                        await _context.SaveChangesAsync();
+                    }
+                }
+
                 foreach (var detalle in venta.DetallesVenta)
                 {
-
                     var movimiento = new MovimientoStock
                     {
                         ProductoId = detalle.ProductoId,
@@ -57,7 +214,13 @@ namespace Farmacia.Services
                     await _movimientoService.CrearMovimientoAsync(movimiento);
                 }
 
-                await _context.SaveChangesAsync();
+                // Ejemplo: 1 punto cada $100 vendidos (ajusta la lógica según tu necesidad)
+                int puntos = (int)(venta.Total / 100);
+                if (puntos > 0)
+                {
+                    await _clienteService.SumarPuntosAsync(venta.ClienteId, puntos, "Compra", null, venta.Id);
+                }
+
                 await transaction.CommitAsync();
 
                 return venta;
@@ -85,29 +248,66 @@ namespace Farmacia.Services
             return lote?.CodigoLote ?? throw new Exception("No hay stock suficiente para el producto.");
         }
 
-        public Task<bool> EliminarVentaAsync(int id)
+        public async Task<bool> EliminarVentaAsync(int id)
         {
-            throw new NotImplementedException();
+            var venta = await _context.Ventas
+                .Include(v => v.DetallesVenta)
+                .FirstOrDefaultAsync(v => v.Id == id);
+
+            if (venta == null)
+                return false;
+
+            // Elimina ClientePromociones relacionadas
+            var clientePromos = await _context.ClientePromociones
+                .Where(cp => cp.VentaId == id)
+                .ToListAsync();
+            _context.ClientePromociones.RemoveRange(clientePromos);
+
+            // Elimina ClientePuntos relacionados
+            var clientePuntos = await _context.ClientePuntos
+                .Where(cp => cp.VentaId == id)
+                .ToListAsync();
+            _context.ClientePuntos.RemoveRange(clientePuntos);
+
+            // Elimina detalles primero
+            _context.DetallesVenta.RemoveRange(venta.DetallesVenta);
+            _context.Ventas.Remove(venta);
+
+            await _context.SaveChangesAsync();
+            return true;
         }
 
-        public Task<List<DetalleVenta>> ObtenerDetallesVentaPorIdAsync(int id)
+        public async Task<List<DetalleVenta>> ObtenerDetallesVentaPorIdAsync(int ventaId)
         {
-            throw new NotImplementedException();
+            return await _context.DetallesVenta
+                .Where(d => d.VentaId == ventaId)
+                .Include(d => d.Producto)
+                .ToListAsync();
         }
 
-        public Task<List<ClientePromocion>> ObtenerPromocionesAplicadasAsync(int clienteId, int ventaId)
+        public async Task<List<ClientePromocion>> ObtenerPromocionesAplicadasAsync(int clienteId, int ventaId)
         {
-            throw new NotImplementedException();
+            return await _context.ClientePromociones
+                .Where(cp => cp.ClienteId == clienteId && cp.VentaId == ventaId)
+                .Include(cp => cp.Promocion)
+                .ToListAsync();
         }
 
-        public Task<Venta> ObtenerVentaPorIdAsync(int id)
+        public async Task<Venta> ObtenerVentaPorIdAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _context.Ventas
+                .Include(v => v.Cliente)
+                .Include(v => v.DetallesVenta)
+                .FirstOrDefaultAsync(v => v.Id == id);
         }
 
-        public Task<List<Venta>> ObtenerVentasAsync()
+        public async Task<List<Venta>> ObtenerVentasAsync()
         {
-            throw new NotImplementedException();
+            return await _context.Ventas
+                .Include(v => v.Cliente)
+                .Include(v => v.DetallesVenta)
+                .OrderByDescending(v => v.Fecha)
+                .ToListAsync();
         }
     }
 }

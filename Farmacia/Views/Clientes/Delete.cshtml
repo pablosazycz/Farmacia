@@ -1,0 +1,22 @@
+﻿@model Farmacia.Models.Cliente
+
+@{
+    ViewData["Title"] = "Eliminar Cliente";
+}
+
+<h2>Eliminar Cliente</h2>
+
+<h4>¿Estás seguro que deseas eliminar este cliente?</h4>
+<div>
+    <strong>@Model.Nombre @Model.Apellido</strong><br />
+    DNI: @Model.Dni<br />
+    Teléfono: @Model.Telefono<br />
+    Email: @Model.Email<br />
+    Domicilio: @Model.Domicilio
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger mt-2">Eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary mt-2">Cancelar</a>
+</form>

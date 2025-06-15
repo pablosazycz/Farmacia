@@ -4,6 +4,7 @@
     ViewData["Title"] = "Nueva Venta";
     var productos = ViewBag.Productos as List<Farmacia.Models.Producto>;
     var clientes = ViewBag.Clientes as List<Farmacia.Models.Cliente>;
+    var promociones = ViewBag.Promociones as List<Farmacia.Models.Promocion>;
 }
 
 <h2>Nueva Venta</h2>
@@ -15,8 +16,24 @@
             <option value="">Seleccione un cliente</option>
         </select>
     </div>
-
+    <div>
+        <strong>Saldo de puntos:</strong> <span id="saldoPuntos">0</span>
+    </div>
     <hr />
+
+    <div class="form-group">
+        <label for="PromocionId">Promoción</label>
+        <select id="PromocionId" name="PromocionId" class="form-control">
+            <option value="">Sin promoción</option>
+            @if (promociones != null)
+            {
+                foreach (var promo in promociones)
+                {
+                    <option value="@promo.Id">@promo.Nombre (@(promo.Descuento)%)</option>
+                }
+            }
+        </select>
+    </div>
 
     <h4>Detalles de la venta</h4>
     <table class="table" id="tabla-detalles">
@@ -39,7 +56,9 @@
             <option value="">Seleccione una droga</option>
             @foreach (var droga in ViewBag.Drogas as List<Farmacia.Models.Droga>)
             {
-                <option value="@droga.Id">@droga.Nombre @droga.Concentracion</option>
+                <option value="@droga.Id" data-requiere-receta="@(droga.RequiereReceta ? "true" : "false")">
+                    @droga.NombreCompleto
+                </option>
             }
         </select>
     </div>
@@ -57,9 +76,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modalProductosRelacionadosLabel">Productos relacionados (orden FEFO)</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body" id="contenidoProductosRelacionados">
                 <!-- Aquí se cargará el contenido con AJAX -->
@@ -68,113 +85,135 @@
     </div>
 </div>
 
+<div class="modal fade" id="modalRecetaObligatoria" tabindex="-1" role="dialog" aria-labelledby="modalRecetaObligatoriaLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalRecetaObligatoriaLabel">¡Atención!</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                Esta droga requiere receta médica obligatoria para su venta.
+            </div>
+            
+        </div>
+    </div>
+</div>
+
 
 @section Scripts {
     <script>
-        
+        // Contador global para los índices de los detalles
+        var filaIndex = 0;
 
+        // Espera a que el DOM esté listo
+        $(function () {
+            // Validación antes de enviar el formulario
+            $('form[asp-action="Crear"]').on('submit', function (e) {
+                var filas = $('#tabla-detalles tbody tr');
+                if (filas.length === 0) {
+                    alert('Debe agregar al menos un producto a la venta.');
+                    e.preventDefault();
+                    return false;
+                }
+            });
+
+            // Actualiza el saldo de puntos al cambiar el cliente
+            $('#ClienteId').change(function () {
+                var clienteId = $(this).val();
+                $.get('/Ventas/ObtenerSaldoPuntos', { clienteId: clienteId }, function (data) {
+                    $('#saldoPuntos').text(data.saldo);
+                });
+            });
+
+            // Carga productos relacionados al seleccionar una droga
+            $('#drogaSelect').on('change', function () {
+                  var selectedOption = $(this).find('option:selected');
+                    var requiereReceta = selectedOption.data('requiere-receta');
+                    if (requiereReceta === true || requiereReceta === "true") {
+            $('#modalRecetaObligatoria').modal('show');
+        }
+                var drogaId = $(this).val();
+                if (drogaId) {
+                    $.ajax({
+                        url: `/Productos/ProductosPorDroga?id=${drogaId}`,
+                        type: 'GET',
+                        success: function (partialHtml) {
+                            $('#contenidoProductosRelacionados').html(partialHtml);
+                            $('#modalProductosRelacionados').modal('show');
+                        },
+                        error: function () {
+                            alert("Error al cargar los productos relacionados.");
+                        }
+                    });
+                }
+            });
+        });
+
+        // Actualiza el precio unitario y el subtotal al cambiar el producto
         function actualizarPrecio(selectElement) {
-            const selectedId = selectElement.value;
-            const producto = productos.find(p => p.id == selectedId);
-            const row = selectElement.closest('tr');
+            var selectedId = $(selectElement).val();
+            var producto = productos.find(p => p.id == selectedId);
+            var $row = $(selectElement).closest('tr');
 
             if (producto) {
-                const precioInput = row.querySelector('.precio-unitario');
-                precioInput.value = producto.precioUnitario.toFixed(2);
-
-                const hiddenProductoId = row.querySelector('[name$=".ProductoId"]');
-                hiddenProductoId.value = producto.id;
-
+                $row.find('.precio-unitario').val(producto.precioUnitario.toFixed(2));
+                $row.find('[name$=".ProductoId"]').val(producto.id);
                 actualizarSubtotal(selectElement);
             }
         }
 
+        // Actualiza el subtotal al cambiar la cantidad
         function actualizarSubtotal(inputElement) {
-            const row = inputElement.closest('tr');
-            const cantidad = parseFloat(row.querySelector('.cantidad-input').value);
-            const precio = parseFloat(row.querySelector('.precio-unitario').value);
-            const subtotalInput = row.querySelector('.subtotal');
-            const hiddenCantidad = row.querySelector('[name$=".Cantidad"]');
+            var $row = $(inputElement).closest('tr');
+            var cantidad = parseFloat($row.find('.cantidad-input').val());
+            var precio = parseFloat($row.find('.precio-unitario').val());
+            var $subtotalInput = $row.find('.subtotal');
+            var $hiddenCantidad = $row.find('[name$=".Cantidad"]');
 
             if (!isNaN(cantidad) && !isNaN(precio)) {
-                const subtotal = cantidad * precio;
-                subtotalInput.value = subtotal.toFixed(2);
-                hiddenCantidad.value = cantidad;
+                var subtotal = cantidad * precio;
+                $subtotalInput.val(subtotal.toFixed(2));
+                $hiddenCantidad.val(cantidad);
             }
 
             calcularTotal();
         }
 
+        // Calcula el total de la venta
         function calcularTotal() {
-            let total = 0;
-            document.querySelectorAll('.subtotal').forEach(input => {
-                total += parseFloat(input.value) || 0;
+            var total = 0;
+            $('.subtotal').each(function () {
+                total += parseFloat($(this).val()) || 0;
             });
-
-            document.getElementById('totalVenta').innerText = total.toFixed(2);
-            document.querySelector('input[name="Total"]').value = total.toFixed(2);
+            $('#totalVenta').text(total.toFixed(2));
+            $('input[name="Total"]').val(total.toFixed(2));
         }
 
-                function seleccionarProductoDesdeSugerencia(productoId, productoNombre, precioUnitario) {
-            const modal = document.getElementById('modalProductosRelacionados');
-            const filaIndex = $('#modalProductosRelacionados').data('fila-activa-id');
-
-            if (!filaIndex) {
-                console.error("No se encontró el índice de fila activa en el modal.");
-                return;
-            }
-
-            const tbody = document.querySelector('#tabla-detalles tbody');
-
-            const row = document.createElement('tr');
-            row.setAttribute('data-fila-id', filaIndex);
-
-            row.innerHTML = `
-                <td>
-                    <select class="form-control" onchange="actualizarPrecio(this)">
-                        <option value="${productoId}" selected>${productoNombre}</option>
-                    </select>
-                </td>
-                <td><input type="number" class="form-control cantidad-input" min="1" value="1" oninput="actualizarSubtotal(this)" /></td>
-                <td><input type="text" class="form-control precio-unitario" value="${precioUnitario.toFixed(2)}" readonly /></td>
-                <td><input type="text" class="form-control subtotal" value="${precioUnitario.toFixed(2)}" readonly /></td>
-                <td><button type="button" class="btn btn-danger" onclick="this.closest('tr').remove(); calcularTotal();">Eliminar</button></td>
-
-                <input type="hidden" name="DetallesVenta.Index" value="${filaIndex}" />
-                <input type="hidden" name="DetallesVenta[${filaIndex}].ProductoId" value="${productoId}" />
-                <input type="hidden" name="DetallesVenta[${filaIndex}].Cantidad" value="1" />
+        // Agrega un producto a la tabla de detalles
+        function seleccionarProductoDesdeSugerencia(productoId, productoNombre, precioUnitario) {
+            var $tbody = $('#tabla-detalles tbody');
+            var rowHtml = `
+                <tr data-fila-id="${filaIndex}">
+                    <td>
+                        <select class="form-control" onchange="actualizarPrecio(this)">
+                            <option value="${productoId}" selected>${productoNombre}</option>
+                        </select>
+                    </td>
+                    <td><input type="number" class="form-control cantidad-input" min="1" value="1" oninput="actualizarSubtotal(this)" /></td>
+                    <td><input type="text" class="form-control precio-unitario" value="${precioUnitario.toFixed(2)}" readonly /></td>
+                    <td><input type="text" class="form-control subtotal" value="${precioUnitario.toFixed(2)}" readonly /></td>
+                    <td><button type="button" class="btn btn-danger" onclick="$(this).closest('tr').remove(); calcularTotal();">Eliminar</button></td>
+                    <input type="hidden" name="DetallesVenta.Index" value="${filaIndex}" />
+                    <input type="hidden" name="DetallesVenta[${filaIndex}].ProductoId" value="${productoId}" />
+                    <input type="hidden" name="DetallesVenta[${filaIndex}].Cantidad" value="1" />
+                    <input type="hidden" name="DetallesVenta[${filaIndex}].PrecioUnitario" value="${precioUnitario}" />
+                </tr>
             `;
-
-            tbody.appendChild(row);
+            $tbody.append(rowHtml);
             calcularTotal();
             $('#modalProductosRelacionados').modal('hide');
+            filaIndex++;
         }
-
     </script>
-
-    <script>
-                $('#drogaSelect').on('change', function () {
-            const drogaId = $(this).val();
-
-            if (drogaId) {
-                // Generar un nuevo índice único para identificar la fila nueva
-                const filaIndex = Date.now();
-                $('#modalProductosRelacionados').data('fila-activa-id', filaIndex);
-
-                $.ajax({
-                    url: `/Productos/ProductosPorDroga?id=${drogaId}`,
-                    type: 'GET',
-                    success: function (partialHtml) {
-                        $('#contenidoProductosRelacionados').html(partialHtml);
-                        $('#modalProductosRelacionados').modal('show');
-                    },
-                    error: function () {
-                        alert("Error al cargar los productos relacionados.");
-                    }
-                });
-            }
-        });
-
-    </script>
-
 }

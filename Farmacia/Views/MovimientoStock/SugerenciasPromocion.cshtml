@@ -1,0 +1,62 @@
+﻿@model List<Farmacia.Models.Producto>
+
+<h2>Productos Sugeridos para Promoción</h2>
+
+<form method="get" asp-action="SugerenciasPromocion" class="row g-3 mb-3">
+    <div class="col-auto">
+        <label for="diasAVencer" class="form-label">Días hasta vencimiento</label>
+        <input type="number" class="form-control" id="diasAVencer" name="diasAVencer" min="1" value="@ViewBag.DiasAVencer" />
+    </div>
+    <div class="col-auto">
+        <label for="stockAlto" class="form-label">Stock alto mínimo</label>
+        <input type="number" class="form-control" id="stockAlto" name="stockAlto" min="1" value="@ViewBag.StockAlto" />
+    </div>
+    <div class="col-auto align-self-end">
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+    </div>
+</form>
+
+<table class="table table-striped" id="example">
+    <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Stock Próximos a Vencer</th>
+            <th>Fecha de Vencimiento más próxima</th>
+            <th>Sugerencia</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var p in Model)
+        {
+            var lotesProximos = p.Lotes
+            .Where(l => l.FechaVencimiento > DateTime.Today && l.FechaVencimiento <= DateTime.Today.AddDays((int)ViewBag.DiasAVencer))
+            .ToList();
+
+            if (lotesProximos.Any())
+            {
+                <tr>
+                    <td>@p.NombreComercial @p.PresentacionCompleta</td>
+                    <td>@lotesProximos.Sum(l => l.Cantidad)</td>
+                    <td>@lotesProximos.Min(l => l.FechaVencimiento).ToShortDateString()</td>
+                    <td>
+                        <span class="text-warning">Promocionar</span>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#example').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                },
+                pageLength: 10,
+                order: [[0, 'desc']]
+            });
+        });
+    </script>
+}

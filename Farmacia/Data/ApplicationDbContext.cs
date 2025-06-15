@@ -20,6 +20,8 @@ namespace Farmacia.Data
         public DbSet<Lote> Lotes { get; set; }
         public DbSet<Promocion> Promociones { get; set; }
         public DbSet<ClientePromocion> ClientePromociones { get; set; }
-        public DbSet<MovimientoStock> MovimientosStock { get; set; }    
+        public DbSet<MovimientoStock> MovimientosStock { get; set; }
+        public DbSet<ClientePunto> ClientePuntos { get; set; }
+
     }
 }

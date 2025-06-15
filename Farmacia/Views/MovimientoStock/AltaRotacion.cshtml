@@ -1,0 +1,33 @@
+﻿@model List<(Farmacia.Models.Producto producto, int cantidadVendida)>
+
+<h2>Productos de Alta Rotación (último mes)</h2>
+<table class="table table-striped" id="example">
+    <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Cantidad Vendida</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.producto.NombreComercial</td>
+                <td>@item.cantidadVendida</td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#example').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                },
+                pageLength: 10,
+                order: [[0, 'desc']] // Ordena por la columna Fecha de forma descendente
+            });
+        });
+    </script>
+}

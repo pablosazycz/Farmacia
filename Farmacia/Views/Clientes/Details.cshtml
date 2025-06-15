@@ -1,0 +1,67 @@
+﻿@model Farmacia.Models.Cliente
+
+@{
+    ViewData["Title"] = "Detalle de Cliente";
+    var historial = ViewBag.HistorialPuntos as List<Farmacia.Models.ClientePunto>;
+
+}
+
+<h2>Detalle de Cliente</h2>
+
+<div class="card">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Nombre</dt>
+            <dd class="col-sm-9">@Model.Nombre</dd>
+
+            <dt class="col-sm-3">Apellido</dt>
+            <dd class="col-sm-9">@Model.Apellido</dd>
+
+            <dt class="col-sm-3">DNI</dt>
+            <dd class="col-sm-9">@Model.Dni</dd>
+
+            <dt class="col-sm-3">Teléfono</dt>
+            <dd class="col-sm-9">@Model.Telefono</dd>
+
+            <dt class="col-sm-3">Email</dt>
+            <dd class="col-sm-9">@Model.Email</dd>
+
+            <dt class="col-sm-3">Domicilio</dt>
+            <dd class="col-sm-9">@Model.Domicilio</dd>
+        </dl>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Editar</a>
+        <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
+    </div>
+</div>
+
+<h4>Historial de puntos</h4>
+@if (historial != null && historial.Any())
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Puntos</th>
+                <th>Motivo</th>
+                <th>Promoción</th>
+                <th>Venta</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var mov in historial)
+            {
+                <tr>
+                    <td>@mov.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@mov.Puntos</td>
+                    <td>@mov.Motivo</td>
+                    <td>@mov.Promocion?.Nombre</td>
+                    <td>@mov.VentaId</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p class="text-muted">Sin movimientos de puntos.</p>
+}

@@ -1,0 +1,166 @@
+@model Farmacia.Models.Venta
+
+@{
+    ViewData["Title"] = "Editar Venta";
+    var clientes = ViewBag.Clientes as List<Farmacia.Models.Cliente>;
+    var productos = ViewBag.Productos as List<Farmacia.Models.Producto>;
+}
+
+<h2>Editar Venta</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label asp-for="ClienteId"></label>
+        <select asp-for="ClienteId" class="form-control" asp-items="@(new SelectList(clientes, "Id", "Nombre"))"></select>
+        <span asp-validation-for="ClienteId" class="text-danger"></span>
+    </div>
+
+    <h4>Detalles de la venta</h4>
+    <table class="table" id="tabla-detalles">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Subtotal</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.DetallesVenta.Count; i++)
+            {
+                <tr>
+                    <td>
+                        <select name="DetallesVenta[@i].ProductoId" class="form-control producto-select" onchange="actualizarPrecio(this)">
+                            <option value="">Seleccione</option>
+                            @foreach (var prod in productos)
+                            {
+                                if (Model.DetallesVenta[i].ProductoId == prod.Id)
+                                {
+                                    @:
+                                    <option value="@prod.Id" selected="selected">@prod.NombreComercial</option>
+                                }
+                                else
+                                {
+                                    @:
+                                    <option value="@prod.Id">@prod.NombreComercial</option>
+                                }
+                            }
+                        </select>
+                        <input type="hidden" name="DetallesVenta[@i].Id" value="@Model.DetallesVenta[i].Id" />
+                    </td>
+                    <td>
+                        <input type="number" name="DetallesVenta[@i].Cantidad" class="form-control cantidad-input" min="1" value="@Model.DetallesVenta[i].Cantidad" oninput="actualizarSubtotal(this)" />
+                    </td>
+                    <td>
+                        <input type="number" name="DetallesVenta[@i].PrecioUnitario" class="form-control precio-unitario" step="0.01" min="0" value="@Model.DetallesVenta[i].PrecioUnitario" readonly />
+                    </td>
+                    <td>
+                        <input type="number" name="DetallesVenta[@i].Subtotal" class="form-control subtotal" step="0.01" min="0" value="@Model.DetallesVenta[i].Subtotal" readonly />
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger" onclick="eliminarFila(this)">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <button type="button" class="btn btn-success" onclick="agregarFila()">Agregar producto</button>
+
+    <div class="form-group mt-3">
+        <label>Total:</label>
+        <input type="text" id="totalVenta" class="form-control" readonly />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+</form>
+
+@section Scripts {
+    <script>
+        // Serializa los productos para JS (usa mayúsculas si tu modelo los tiene así)
+        var productos = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(productos));
+
+        // Inicializa el total al cargar
+        $(function () { calcularTotal(); });
+
+        function actualizarPrecio(selectElement) {
+            var selectedId = parseInt($(selectElement).val());
+            var producto = productos.find(p => p.Id === selectedId);
+            var $row = $(selectElement).closest('tr');
+            if (producto) {
+                $row.find('.precio-unitario').val(producto.PrecioUnitario.toFixed(2));
+                var cantidad = parseFloat($row.find('.cantidad-input').val()) || 0;
+                $row.find('.subtotal').val((cantidad * producto.PrecioUnitario).toFixed(2));
+            } else {
+                $row.find('.precio-unitario').val(0);
+                $row.find('.subtotal').val(0);
+            }
+            calcularTotal();
+        }
+
+        function actualizarSubtotal(inputElement) {
+            var $row = $(inputElement).closest('tr');
+            var cantidad = parseFloat($row.find('.cantidad-input').val()) || 0;
+            var precio = parseFloat($row.find('.precio-unitario').val()) || 0;
+            $row.find('.subtotal').val((cantidad * precio).toFixed(2));
+            calcularTotal();
+        }
+
+        function calcularTotal() {
+            var total = 0;
+            $('.subtotal').each(function () {
+                total += parseFloat($(this).val()) || 0;
+            });
+            $('#totalVenta').val(total.toFixed(2));
+        }
+
+        function eliminarFila(btn) {
+            $(btn).closest('tr').remove();
+            recalcularIndices();
+            calcularTotal();
+        }
+
+        function agregarFila() {
+            var index = $('#tabla-detalles tbody tr').length;
+            var rowHtml = `
+                <tr>
+                    <td>
+                        <select name="DetallesVenta[${index}].ProductoId" class="form-control producto-select" onchange="actualizarPrecio(this)">
+                            <option value="">Seleccione</option>
+                            ${productos.map(p => `<option value="${p.Id}">${p.NombreComercial}</option>`).join('')}
+                        </select>
+                        <input type="hidden" name="DetallesVenta[${index}].Id" value="0" />
+                    </td>
+                    <td>
+                        <input type="number" name="DetallesVenta[${index}].Cantidad" class="form-control cantidad-input" min="1" value="1" oninput="actualizarSubtotal(this)" />
+                    </td>
+                    <td>
+                        <input type="number" name="DetallesVenta[${index}].PrecioUnitario" class="form-control precio-unitario" step="0.01" min="0" value="0" readonly />
+                    </td>
+                    <td>
+                        <input type="number" name="DetallesVenta[${index}].Subtotal" class="form-control subtotal" step="0.01" min="0" value="0" readonly />
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger" onclick="eliminarFila(this)">Eliminar</button>
+                    </td>
+                </tr>
+            `;
+            $('#tabla-detalles tbody').append(rowHtml);
+        }
+
+        function recalcularIndices() {
+            $('#tabla-detalles tbody tr').each(function (i, row) {
+                $(row).find('select, input').each(function () {
+                    var name = $(this).attr('name');
+                    if (name) {
+                        var newName = name.replace(/DetallesVenta\[\d+\]/, `DetallesVenta[${i}]`);
+                        $(this).attr('name', newName);
+                    }
+                });
+            });
+        }
+    </script>
+}

@@ -1,0 +1,21 @@
+@model Farmacia.Models.Promocion
+
+@{
+    ViewData["Title"] = "Eliminar Promoción";
+}
+
+<h2>Eliminar Promoción</h2>
+
+<h4>¿Estás seguro que deseas eliminar esta promoción?</h4>
+<dl class="row">
+    <dt class="col-sm-3">Nombre</dt>
+    <dd class="col-sm-9">@Model.Nombre</dd>
+    <dt class="col-sm-3">Descuento</dt>
+    <dd class="col-sm-9">@Model.Descuento.ToString("P")</dd>
+</dl>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

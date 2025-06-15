@@ -1,25 +1,59 @@
 using System.Diagnostics;
+using System.Security.Claims;
 using AspNetCoreGeneratedDocument;
 using Farmacia.Interfaces;
 using Farmacia.Models;
+using Farmacia.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Farmacia.Controllers
 {
+   // [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
         private readonly ILoteService _loteService;
+        private readonly IProductoService _productoService;
+        private readonly UserManager<IdentityUser> _UserManager;
 
-        public HomeController(ILogger<HomeController> logger, ILoteService loteService)
+        public HomeController(ILogger<HomeController> logger, ILoteService loteService, UserManager<IdentityUser> userManager, IProductoService productoService)
         {
             _logger = logger;
             _loteService = loteService;
+            _UserManager = userManager;
+            _productoService = productoService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            try
+            {
+                var lotesVencidos = await _loteService.ObtenerLotesVencidosAsync();
+
+                var lotesProximos = await _loteService.ObtenerLotesProximosAVencerAsync(30);
+
+                var productosStockCritico = await _productoService.ObtenerProductosConStockCriticoAsync();
+
+                if (productosStockCritico.Any())
+                    ViewBag.AlertaStock = "¡Atención! Hay productos con stock crítico.";
+                if (lotesVencidos.Any())
+                    ViewBag.MensajeVencidos = "¡Atención! Hay productos vencidos.";
+                if (lotesProximos.Any())
+                    ViewBag.MensajeProximos = "¡Aviso! Hay productos próximos a vencer.";
+
+
+                return View();
+            }
+            catch (Exception ex)
+
+            {
+                return BadRequest(ex.Message);
+
+            }
+            //return View();
+
         }
 
         public async Task<IActionResult> ProxAVencer()
@@ -49,6 +83,48 @@ namespace Farmacia.Controllers
                 return View("Error", new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
             }
         }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> DarDeBajaTodos()
+        {
+            var usuarioId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (usuarioId == null)
+            {
+                return BadRequest("Usuario no autenticado. No se puede dar de baja el lote sin un usuario válido.");
+            }
+            await _loteService.DarDeBajaLotesVencidosAsync(usuarioId ?? "sistema");
+            return RedirectToAction("Vencidos");
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> DarDeBajaUno(int loteId)
+        {
+            var usuarioId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (usuarioId == null)
+            {
+                return BadRequest("Usuario no autenticado. No se puede dar de baja el lote sin un usuario válido.");
+            }
+            await _loteService.DarDeBajaLoteVencidoAsync(loteId, usuarioId ?? "sistema");
+            return RedirectToAction("Vencidos");
+        }
+
+        public async Task<IActionResult> StockCritico()
+        {
+            try
+            {
+                var stock = await _productoService.ObtenerProductosConStockCriticoAsync();
+                return View(stock);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener los stocks");
+                return View("Error", new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            }
+        }
+
+
 
         public IActionResult Privacy()
         {

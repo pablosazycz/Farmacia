@@ -24,11 +24,11 @@ namespace Farmacia.Data.Migrations
 
             modelBuilder.Entity("Farmacia.Models.Cliente", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int?>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("Id"));
 
                     b.Property<string>("Apellido")
                         .IsRequired()
@@ -87,6 +87,43 @@ namespace Farmacia.Data.Migrations
                     b.ToTable("ClientePromociones");
                 });
 
+            modelBuilder.Entity("Farmacia.Models.ClientePunto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ClienteId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Motivo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("PromocionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Puntos")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("VentaId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClienteId");
+
+                    b.HasIndex("PromocionId");
+
+                    b.HasIndex("VentaId");
+
+                    b.ToTable("ClientePuntos");
+                });
+
             modelBuilder.Entity("Farmacia.Models.DetalleVenta", b =>
                 {
                     b.Property<int>("Id")
@@ -103,6 +140,9 @@ namespace Farmacia.Data.Migrations
 
                     b.Property<int>("ProductoId")
                         .HasColumnType("int");
+
+                    b.Property<decimal>("Subtotal")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("VentaId")
                         .HasColumnType("int");
@@ -176,6 +216,9 @@ namespace Farmacia.Data.Migrations
                     b.Property<DateTime>("FechaVencimiento")
                         .HasColumnType("datetime2");
 
+                    b.Property<decimal>("PrecioCompra")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int>("ProductoId")
                         .HasColumnType("int");
 
@@ -223,6 +266,9 @@ namespace Farmacia.Data.Migrations
                     b.Property<string>("UsuarioId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<int?>("VentaId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("DrogaId");
@@ -232,6 +278,8 @@ namespace Farmacia.Data.Migrations
                     b.HasIndex("ProductoId");
 
                     b.HasIndex("UsuarioId");
+
+                    b.HasIndex("VentaId");
 
                     b.ToTable("MovimientosStock");
                 });
@@ -579,6 +627,29 @@ namespace Farmacia.Data.Migrations
                     b.Navigation("Venta");
                 });
 
+            modelBuilder.Entity("Farmacia.Models.ClientePunto", b =>
+                {
+                    b.HasOne("Farmacia.Models.Cliente", "Cliente")
+                        .WithMany("MovimientosPuntos")
+                        .HasForeignKey("ClienteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Farmacia.Models.Promocion", "Promocion")
+                        .WithMany()
+                        .HasForeignKey("PromocionId");
+
+                    b.HasOne("Farmacia.Models.Venta", "Venta")
+                        .WithMany()
+                        .HasForeignKey("VentaId");
+
+                    b.Navigation("Cliente");
+
+                    b.Navigation("Promocion");
+
+                    b.Navigation("Venta");
+                });
+
             modelBuilder.Entity("Farmacia.Models.DetalleVenta", b =>
                 {
                     b.HasOne("Farmacia.Models.Producto", "Producto")
@@ -629,6 +700,10 @@ namespace Farmacia.Data.Migrations
                         .WithMany()
                         .HasForeignKey("UsuarioId");
 
+                    b.HasOne("Farmacia.Models.Venta", "Venta")
+                        .WithMany()
+                        .HasForeignKey("VentaId");
+
                     b.Navigation("Droga");
 
                     b.Navigation("Lote");
@@ -636,6 +711,8 @@ namespace Farmacia.Data.Migrations
                     b.Navigation("Producto");
 
                     b.Navigation("Usuario");
+
+                    b.Navigation("Venta");
                 });
 
             modelBuilder.Entity("Farmacia.Models.Producto", b =>
@@ -719,6 +796,8 @@ namespace Farmacia.Data.Migrations
 
             modelBuilder.Entity("Farmacia.Models.Cliente", b =>
                 {
+                    b.Navigation("MovimientosPuntos");
+
                     b.Navigation("Ventas");
                 });
 

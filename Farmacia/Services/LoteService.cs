@@ -8,10 +8,12 @@ namespace Farmacia.Services
     public class LoteService : ILoteService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMovimientoStockService _movimientoStockService;
 
-        public LoteService(ApplicationDbContext context)
+        public LoteService(ApplicationDbContext context, IMovimientoStockService movimientoStockService)
         {
             _context = context;
+            _movimientoStockService = movimientoStockService;
         }
 
         public async Task<Lote> CrearLoteAsync(Lote lote)
@@ -127,5 +129,57 @@ namespace Farmacia.Services
                 .Include(l => l.Producto)
                 .ToListAsync();
         }
+
+        // C#
+        public async Task DarDeBajaLotesVencidosAsync(string usuarioId)
+        {
+            var lotesVencidos = await _context.Lotes
+                .Include(l => l.Producto)
+                .Where(l => l.FechaVencimiento < DateTime.Now && l.Cantidad > 0)
+                .ToListAsync();
+
+            foreach (var lote in lotesVencidos)
+            {
+                int cantidadBaja = lote.Cantidad;
+
+                await _movimientoStockService.CrearMovimientoAsync(new MovimientoStock
+                {
+                    ProductoId = lote.ProductoId,
+                    LoteId = lote.Id,
+                    Cantidad = cantidadBaja,
+                    Fecha = DateTime.Now,
+                    TipoMovimiento = TipoMovimiento.BajaPorVencimiento,
+                    UsuarioId = usuarioId,
+                    Observaciones = "Baja automática por vencimiento",
+                    CodigoLote = lote.CodigoLote,
+                    DrogaId = lote.Producto?.DrogaId ?? 0 // Asigna el DrogaId correctamente
+                });
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        // C#
+        public async Task DarDeBajaLoteVencidoAsync(int loteId, string usuarioId)
+        {
+            var lote = await _context.Lotes.Include(l => l.Producto).FirstOrDefaultAsync(l => l.Id == loteId && l.Cantidad > 0);
+            if (lote == null) return;
+
+            int cantidadBaja = lote.Cantidad;
+
+            await _movimientoStockService.CrearMovimientoAsync(new MovimientoStock
+            {
+                ProductoId = lote.ProductoId,
+                LoteId = lote.Id,
+                Cantidad = cantidadBaja,
+                Fecha = DateTime.Now,
+                TipoMovimiento = TipoMovimiento.BajaPorVencimiento,
+                UsuarioId = usuarioId,
+                Observaciones = "Baja automática por vencimiento",
+                CodigoLote = lote.CodigoLote,
+                DrogaId = lote.Producto?.DrogaId ?? 0
+            });
+        }
+
     }
 }

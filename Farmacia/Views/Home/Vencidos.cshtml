@@ -3,11 +3,20 @@
 
 <div>
     <h3>Vencidos</h3>
+
+    <form asp-action="DarDeBajaTodos" method="post">
+        <button type="submit" class="btn btn-danger mb-3">Dar de baja todos los vencidos</button>
+    </form>
     <table class="table table-striped" id="example">
         <thead>
             <tr>
                 <th>Medicamento</th>
+                <th>Presentacion</th>
+                <th>Cantidad</th>
+                <th>Lote</th>
                 <th>Fecha de Vencimiento</th>
+                <th>Acciones</th>
+
             </tr>
         </thead>
         <tbody>
@@ -15,7 +24,16 @@
             {
                 <tr>
                     <td>@lote?.Producto?.NombreComercial</td>
+                    <td>@lote?.Producto?.PresentacionCompleta</td>
+                    <td>@lote?.Cantidad</td>
+                    <td>@lote?.CodigoLote</td>
                     <td>@lote?.FechaVencimiento.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        <form asp-action="DarDeBajaUno" method="post">
+                            <input type="hidden" name="loteId" value="@lote.Id" />
+                            <button type="submit" class="btn btn-warning btn-sm">Dar de baja</button>
+                        </form>
+                    </td>
                 </tr>
             }
         </tbody>

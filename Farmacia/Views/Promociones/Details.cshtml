@@ -1,0 +1,29 @@
+@model Farmacia.Models.Promocion
+
+@{
+    ViewData["Title"] = "Detalle de Promoción";
+}
+
+<h2>Detalle de Promoción</h2>
+
+<dl class="row">
+    <dt class="col-sm-3">Nombre</dt>
+    <dd class="col-sm-9">@Model.Nombre</dd>
+
+    <dt class="col-sm-3">Descuento</dt>
+    <dd class="col-sm-9">@Model.Descuento:P</dd>
+
+    <dt class="col-sm-3">Tipo</dt>
+    <dd class="col-sm-9">@Model.Tipo</dd>
+
+    <dt class="col-sm-3">Cantidad Mínima</dt>
+    <dd class="col-sm-9">@Model.CantidadMinima</dd>
+
+    <dt class="col-sm-3">Periodo</dt>
+    <dd class="col-sm-9">@Model.Periodo</dd>
+
+    <dt class="col-sm-3">Activa</dt>
+    <dd class="col-sm-9">@((Model.Activa) ? "Sí" : "No")</dd>
+</dl>
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Editar</a>
+<a asp-action="Index" class="btn btn-secondary">Volver</a>

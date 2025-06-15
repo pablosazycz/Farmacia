@@ -1,0 +1,42 @@
+@model Farmacia.Models.Promocion
+
+@{
+    ViewData["Title"] = "Nueva Promoción";
+}
+
+<h2>Nueva Promoción</h2>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="Nombre"></label>
+        <input asp-for="Nombre" class="form-control" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Descuento"></label>
+        <input asp-for="Descuento" class="form-control" />
+        <span asp-validation-for="Descuento" class="text-danger"></span>
+        <small class="form-text text-muted">Ejemplo: 0.10 para 10%</small>
+    </div>
+    <div class="form-group">
+        <label asp-for="Tipo"></label>
+        <input asp-for="Tipo" class="form-control" />
+        <span asp-validation-for="Tipo" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="CantidadMinima"></label>
+        <input asp-for="CantidadMinima" class="form-control" />
+        <span asp-validation-for="CantidadMinima" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Periodo"></label>
+        <input asp-for="Periodo" class="form-control" />
+        <span asp-validation-for="Periodo" class="text-danger"></span>
+    </div>
+    <div class="form-group form-check">
+        <input asp-for="Activa" class="form-check-input" />
+        <label asp-for="Activa" class="form-check-label"></label>
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+</form>
