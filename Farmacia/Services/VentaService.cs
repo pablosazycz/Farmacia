@@ -165,38 +165,40 @@ namespace Farmacia.Services
                 venta.Fecha = DateTime.Now;
                 venta.Total = venta.DetallesVenta.Sum(d => d.Subtotal);
 
-                // Aplica promoción si corresponde (calcula descuento antes de guardar la venta)
-                if (promocionId.HasValue)
+                // 1. Consultar puntos del cliente
+                int puntosCliente = await _clienteService.ObtenerSaldoPuntosAsync(venta.ClienteId);
+
+                // 2. Buscar la mejor promoción disponible según puntos
+                var promociones = await _context.Promociones
+                    .Where(p => p.Activa && p.CantidadMinima.HasValue && p.CantidadMinima <= puntosCliente)
+                    .OrderByDescending(p => p.Descuento)
+                    .ToListAsync();
+
+                Promocion? promo = promociones.FirstOrDefault();
+
+                if (promo != null)
                 {
-                    var promo = await _context.Promociones.FindAsync(promocionId.Value);
-                    if (promo != null && promo.Activa)
-                    {
-                        // Si promo.Descuento es 10 para 10%, divide por 100m
-                        var descuento = venta.Total * (promo.Descuento / 100m);
-                        venta.DescuentoAplicado = descuento;
-                        venta.Total -= descuento;
-                    }
+                    // Aplica la mejor promoción
+                    var descuento = venta.Total * (promo.Descuento / 100m);
+                    venta.DescuentoAplicado = descuento;
+                    venta.Total -= descuento;
                 }
 
                 _context.Ventas.Add(venta);
                 await _context.SaveChangesAsync();
 
-                // Ahora que la venta tiene Id, registra la relación con la promoción
-                if (promocionId.HasValue)
+                // Registrar la relación con la promoción si corresponde
+                if (promo != null)
                 {
-                    var promo = await _context.Promociones.FindAsync(promocionId.Value);
-                    if (promo != null && promo.Activa)
+                    var clientePromocion = new ClientePromocion
                     {
-                        var clientePromocion = new ClientePromocion
-                        {
-                            ClienteId = venta.ClienteId,
-                            PromocionId = promo.Id,
-                            FechaAplicacion = DateTime.Now,
-                            VentaId = venta.Id
-                        };
-                        _context.ClientePromociones.Add(clientePromocion);
-                        await _context.SaveChangesAsync();
-                    }
+                        ClienteId = venta.ClienteId,
+                        PromocionId = promo.Id,
+                        FechaAplicacion = DateTime.Now,
+                        VentaId = venta.Id
+                    };
+                    _context.ClientePromociones.Add(clientePromocion);
+                    await _context.SaveChangesAsync();
                 }
 
                 foreach (var detalle in venta.DetallesVenta)
@@ -214,11 +216,11 @@ namespace Farmacia.Services
                     await _movimientoService.CrearMovimientoAsync(movimiento);
                 }
 
-                // Ejemplo: 1 punto cada $100 vendidos (ajusta la lógica según tu necesidad)
+                // Sumar puntos por la compra
                 int puntos = (int)(venta.Total / 100);
                 if (puntos > 0)
                 {
-                    await _clienteService.SumarPuntosAsync(venta.ClienteId, puntos, "Compra", null, venta.Id);
+                    await _clienteService.SumarPuntosAsync(venta.ClienteId, puntos, "Compra", promo?.Id, venta.Id);
                 }
 
                 await transaction.CommitAsync();
