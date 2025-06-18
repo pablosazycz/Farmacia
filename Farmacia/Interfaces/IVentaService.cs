@@ -11,6 +11,6 @@ namespace Farmacia.Interfaces
         Task<List<Venta>> ObtenerVentasAsync();
         Task<List<DetalleVenta>> ObtenerDetallesVentaPorIdAsync(int ventaId);
         Task<List<ClientePromocion>> ObtenerPromocionesAplicadasAsync(int clienteId, int ventaId);
-        Task<bool> AplicarPromocionAsync(ClientePromocion clientePromocion);    
+        Task<bool> AplicarPromocionAsync(ClientePromocion clientePromocion);
     }
 }

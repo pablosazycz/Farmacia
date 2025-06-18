@@ -1,7 +1,6 @@
 ﻿using Farmacia.Interfaces;
 using Farmacia.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace Farmacia.Controllers
 {

@@ -1,9 +1,9 @@
 ﻿using Farmacia.Data;
 using Farmacia.Interfaces;
 using Farmacia.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Identity;
 
 
 namespace Farmacia.Controllers
@@ -44,9 +44,15 @@ namespace Farmacia.Controllers
         }
 
         // GET: MovimientoStock/Details/5
-        public ActionResult Details(int id)
+        public async Task<IActionResult>  Details(int id)
         {
-            return View();
+            var movimiento = await _movimientoStockService.ObtenerPorIdAsync(id);
+
+            if (movimiento == null)
+            {
+                return NotFound();
+            }
+            return View(movimiento);
         }
 
         // GET: MovimientoStock/CrearCompra
@@ -102,7 +108,7 @@ namespace Farmacia.Controllers
             return View();
         }
 
-     
+
         // POST: MovimientoStock/Create
         [HttpPost]
         [ValidateAntiForgeryToken]

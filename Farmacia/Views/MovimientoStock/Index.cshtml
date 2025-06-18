@@ -4,57 +4,68 @@
     ViewData["Title"] = "Movimientos de Stock";
 }
 
-<h2>@ViewData["Title"]</h2>
-
-<div class="btn-group" role="group" aria-label="Basic example">
-    <a type="button" class="btn btn-primary" asp-controller="MovimientoStock" asp-action="CrearCompra">Ingresar Mercaderia</a>
-    <a type="button" class="btn btn-primary" asp-controller="MovimientoStock" asp-action="CrearVenta" >Generar Venta</a>
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">@ViewData["Title"]</h4>
+                <div>
+                    <a class="btn btn-light text-success fw-bold me-2" asp-controller="MovimientoStock" asp-action="CrearCompra">
+                        <i class="bi bi-box-arrow-in-down"></i> Ingresar Mercadería
+                    </a>
+                    <a class="btn btn-light text-success fw-bold" asp-controller="MovimientoStock" asp-action="CrearVenta">
+                        <i class="bi bi-cash-coin"></i> Generar Venta
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped align-middle" id="tablaMovimientos">
+                    <thead class="table-success">
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Tipo</th>
+                            <th>Droga</th>
+                            <th>Producto</th>
+                            <th>Presentación</th>
+                            <th>Cantidad</th>
+                            <th>Usuario</th>
+                            <th>Código Lote</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@item.TipoMovimiento.ToString()</td>
+                                <td>@item.Droga?.NombreCompleto</td>
+                                <td>@item.Producto.NombreComercial</td>
+                                <td>@item.Producto?.PresentacionCompleta</td>
+                                <td>@item.Cantidad</td>
+                                <td>@item.Usuario?.UserName</td>
+                                <td>@item.CodigoLote</td>
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Detalles</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
-
-<table class="table table-bordered table-striped" id="example">
-    <thead>
-        <tr>
-            <th>Fecha</th>
-            <th>Tipo</th>
-            <th>Droga</th>
-            <th>Producto</th>
-            <th>Presentacion</th>
-            <th>Cantidad</th>
-            <th>Usuario</th>
-            <th>Código Lote</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach (var item in Model)
-    {
-        <tr>
-            <td>@item.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
-            <td>@item.TipoMovimiento.ToString()</td>
-            <td>@item.Droga?.NombreCompleto</td>
-            <td>@item.Producto.NombreComercial</td>
-            <td>@item.Producto?.PresentacionCompleta</td>
-            <td>@item.Cantidad</td>
-            <td>@item.Usuario?.UserName</td>
-            <td>@item.CodigoLote</td>
-            <td>
-                @* Acciones como editar o ver detalle, opcional *@
-                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Detalles</a>
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
 
 @section Scripts {
     <script>
         $(document).ready(function () {
-            $('#example').DataTable({
+            $('#tablaMovimientos').DataTable({
                 language: {
                     url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
                 },
                 pageLength: 10,
-                order: [[0, 'desc']] // Ordena por la columna Fecha de forma descendente
+                order: [[0, 'desc']]
             });
         });
     </script>

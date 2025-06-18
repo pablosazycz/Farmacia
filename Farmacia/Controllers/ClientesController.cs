@@ -1,7 +1,6 @@
 ﻿using Farmacia.Interfaces;
 using Farmacia.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace Farmacia.Controllers
 {
@@ -32,7 +31,7 @@ namespace Farmacia.Controllers
                 text = c.Nombre + " " + c.Apellido + " (" + c.Dni + ")"
             });
 
-          
+
             return Json(new { results = resultado });
         }
 

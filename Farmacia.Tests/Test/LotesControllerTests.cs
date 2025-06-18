@@ -1,10 +1,8 @@
-using Xunit;
 using Farmacia.Controllers;
+using Farmacia.Data;
 using Farmacia.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Farmacia.Data;
-using System.Threading.Tasks;
 
 namespace Farmacia.Tests.Test
 {

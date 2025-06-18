@@ -4,19 +4,29 @@
     ViewData["Title"] = "Eliminar Cliente";
 }
 
-<h2>Eliminar Cliente</h2>
-
-<h4>¿Estás seguro que deseas eliminar este cliente?</h4>
-<div>
-    <strong>@Model.Nombre @Model.Apellido</strong><br />
-    DNI: @Model.Dni<br />
-    Teléfono: @Model.Telefono<br />
-    Email: @Model.Email<br />
-    Domicilio: @Model.Domicilio
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">Eliminar Cliente</h4>
+            </div>
+            <div class="card-body">
+                <h5 class="mb-3">¿Estás seguro que deseas eliminar este cliente?</h5>
+                <ul class="list-group mb-3">
+                    <li class="list-group-item"><strong>Nombre:</strong> @Model.Nombre @Model.Apellido</li>
+                    <li class="list-group-item"><strong>DNI:</strong> @Model.Dni</li>
+                    <li class="list-group-item"><strong>Teléfono:</strong> @Model.Telefono</li>
+                    <li class="list-group-item"><strong>Email:</strong> @Model.Email</li>
+                    <li class="list-group-item"><strong>Domicilio:</strong> @Model.Domicilio</li>
+                </ul>
+                <form asp-action="Delete" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-danger px-4">Eliminar</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
-
-<form asp-action="Delete" method="post">
-    <input type="hidden" asp-for="Id" />
-    <button type="submit" class="btn btn-danger mt-2">Eliminar</button>
-    <a asp-action="Index" class="btn btn-secondary mt-2">Cancelar</a>
-</form>

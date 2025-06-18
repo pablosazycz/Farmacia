@@ -8,7 +8,7 @@ namespace Farmacia.Models
         public int Id { get; set; }
 
         [Required]
-        [Display(Name ="Nombre")]
+        [Display(Name = "Nombre")]
         public string NombreComercial { get; set; }
         [Display(Name = "Lab")]
         public string Laboratorio { get; set; }

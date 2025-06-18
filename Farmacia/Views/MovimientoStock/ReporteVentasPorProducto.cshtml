@@ -1,38 +1,50 @@
 ﻿@model List<(Farmacia.Models.Producto producto, int cantidadVendida)>
 
-<h2>Reporte de Ventas y Consumo por Producto</h2>
+@{
+    ViewData["Title"] = "Reporte de Ventas y Consumo por Producto";
+}
 
-<form method="get" asp-action="ReporteVentasPorProducto" class="row g-3 mb-3">
-    <div class="col-auto">
-        <label for="desde" class="form-label">Desde</label>
-        <input type="date" class="form-control" id="desde" name="desde" value="@ViewBag.FechaDesde" />
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">Reporte de Ventas y Consumo por Producto</h4>
+            </div>
+            <div class="card-body">
+                <form method="get" asp-action="ReporteVentasPorProducto" class="row g-3 mb-3">
+                    <div class="col-auto">
+                        <label for="desde" class="form-label">Desde</label>
+                        <input type="date" class="form-control" id="desde" name="desde" value="@ViewBag.FechaDesde" />
+                    </div>
+                    <div class="col-auto">
+                        <label for="hasta" class="form-label">Hasta</label>
+                        <input type="date" class="form-control" id="hasta" name="hasta" value="@ViewBag.FechaHasta" />
+                    </div>
+                    <div class="col-auto align-self-end">
+                        <button type="submit" class="btn btn-success">Filtrar</button>
+                    </div>
+                </form>
+                <table class="table table-striped align-middle" id="tablaReporte">
+                    <thead class="table-success">
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad Vendida</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.producto.NombreComercial @item.producto.PresentacionCompleta</td>
+                                <td>@item.cantidadVendida</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-    <div class="col-auto">
-        <label for="hasta" class="form-label">Hasta</label>
-        <input type="date" class="form-control" id="hasta" name="hasta" value="@ViewBag.FechaHasta" />
-    </div>
-    <div class="col-auto align-self-end">
-        <button type="submit" class="btn btn-primary">Filtrar</button>
-    </div>
-</form>
-
-<table class="table table-striped" id="tablaReporte">
-    <thead>
-        <tr>
-            <th>Producto</th>
-            <th>Cantidad Vendida</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.producto.NombreComercial @item.producto.PresentacionCompleta</td>
-                <td>@item.cantidadVendida</td>
-            </tr>
-        }
-    </tbody>
-</table>
+</div>
 
 @section Scripts {
     <script>

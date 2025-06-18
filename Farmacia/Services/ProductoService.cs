@@ -26,7 +26,7 @@ namespace Farmacia.Services
                         (!string.IsNullOrEmpty(p.CodigoBarras) && p.CodigoBarras.Contains(term))
                     )
                 )
-                .Include(p=>p.Droga)
+                .Include(p => p.Droga)
                 .OrderBy(p => p.NombreComercial)
                 .Take(20)
                 .ToListAsync();
@@ -167,7 +167,7 @@ namespace Farmacia.Services
                 .ToListAsync();
         }
 
-        public async Task<List<Producto>> ObtenerProductosParaPromocionAsync(int diasAVencer , int stockAlto)
+        public async Task<List<Producto>> ObtenerProductosParaPromocionAsync(int diasAVencer, int stockAlto)
         {
             var hoy = DateTime.Today;
             var fechaLimite = hoy.AddDays(diasAVencer);
@@ -179,8 +179,8 @@ namespace Farmacia.Services
                     l.FechaVencimiento <= fechaLimite &&
                     l.Cantidad >= stockAlto))
                 .ToListAsync();
-        
-        
+
+
         }
 
         public async Task<List<(Producto producto, int cantidadVendida)>> ObtenerReporteVentasPorProductoAsync(DateTime desde, DateTime hasta)

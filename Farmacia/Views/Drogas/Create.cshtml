@@ -1,56 +1,56 @@
 ﻿@model Farmacia.Models.Droga
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Nueva Droga";
 }
 
-<h1>Create</h1>
-
-<h4>Droga</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Nombre" class="control-label"></label>
-                <input asp-for="Nombre" class="form-control" />
-                <span asp-validation-for="Nombre" class="text-danger"></span>
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">Nueva Droga Genérica</h4>
             </div>
-            <div class="form-group">
-                <label asp-for="Concentracion" class="control-label"></label>
-                <input asp-for="Concentracion" class="form-control" />
-                <span asp-validation-for="Concentracion" class="text-danger"></span>
+            <div class="card-body">
+                <form asp-action="Create" autocomplete="off">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <div class="mb-3">
+                        <label asp-for="Nombre" class="form-label"></label>
+                        <input asp-for="Nombre" class="form-control" />
+                        <span asp-validation-for="Nombre" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Concentracion" class="form-label"></label>
+                        <input asp-for="Concentracion" class="form-control" />
+                        <span asp-validation-for="Concentracion" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="StockMinimo" class="form-label"></label>
+                        <input asp-for="StockMinimo" class="form-control" />
+                        <span asp-validation-for="StockMinimo" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="StockMaximo" class="form-label"></label>
+                        <input asp-for="StockMaximo" class="form-control" />
+                        <span asp-validation-for="StockMaximo" class="text-danger"></span>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" asp-for="RequiereReceta" />
+                        <label class="form-check-label" asp-for="RequiereReceta">
+                            @Html.DisplayNameFor(model => model.RequiereReceta)
+                        </label>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-success px-4">Guardar</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">Volver</a>
+                    </div>
+                </form>
             </div>
-           
-            <div class="form-group">
-                <label asp-for="StockMinimo" class="control-label"></label>
-                <input asp-for="StockMinimo" class="form-control" />
-                <span asp-validation-for="StockMinimo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StockMaximo" class="control-label"></label>
-                <input asp-for="StockMaximo" class="form-control" />
-                <span asp-validation-for="StockMaximo" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="RequiereReceta" /> @Html.DisplayNameFor(model => model.RequiereReceta)
-                </label>
-            </div>
-           
-         
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

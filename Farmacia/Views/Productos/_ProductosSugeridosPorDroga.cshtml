@@ -2,7 +2,7 @@
 
 <div class="table-responsive">
     <table class="table table-hover align-middle">
-        <thead class="table-light">
+        <thead class="table-primary">
             <tr>
                 <th>Producto</th>
                 <th>Presentación</th>
@@ -29,7 +29,7 @@
                         <td>@prod.PresentacionCompleta</td>
                         <td>
                             <span class="badge bg-primary" data-bs-toggle="tooltip" title="Precio unitario">
-                                @prod.PrecioUnitario.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)
+                                $@prod.PrecioUnitario.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)
                             </span>
                         </td>
                         <td>

@@ -1,32 +1,30 @@
-using Xunit;
-using Moq;
 using Farmacia.Controllers;
 using Farmacia.Interfaces;
 using Farmacia.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using System.Collections.Generic;
+using Moq;
 
-namespace Farmacia.Tests.Test { 
-public class ProductosControllerTests
+namespace Farmacia.Tests.Test
 {
-    [Fact]
-    public async Task Create_Post_ValidModel_RedirectsToIndex()
+    public class ProductosControllerTests
     {
-        // Arrange
-        var mockProductoService = new Mock<IProductoService>();
-        var mockDrogaService = new Mock<IDrogaService>();
-        mockProductoService.Setup(s => s.CrearProductoAsync(It.IsAny<Producto>())).ReturnsAsync(new Producto());
-        mockDrogaService.Setup(s => s.ObtenerDrogasActivasAsync()).ReturnsAsync(new List<Droga>());
-        var controller = new ProductosController(mockProductoService.Object, mockDrogaService.Object);
-        var producto = new Producto { NombreComercial = "Ibuprofeno", FormaFarmaceutica = "Comprimido", TipoPresentacion = TipoPresentacionEnum.Caja, DrogaId = 1 };
+        [Fact]
+        public async Task Create_Post_ValidModel_RedirectsToIndex()
+        {
+            // Arrange
+            var mockProductoService = new Mock<IProductoService>();
+            var mockDrogaService = new Mock<IDrogaService>();
+            mockProductoService.Setup(s => s.CrearProductoAsync(It.IsAny<Producto>())).ReturnsAsync(new Producto());
+            mockDrogaService.Setup(s => s.ObtenerDrogasActivasAsync()).ReturnsAsync(new List<Droga>());
+            var controller = new ProductosController(mockProductoService.Object, mockDrogaService.Object);
+            var producto = new Producto { NombreComercial = "Ibuprofeno", FormaFarmaceutica = "Comprimido", TipoPresentacion = TipoPresentacionEnum.Caja, DrogaId = 1 };
 
-        // Act
-        var result = await controller.Create(producto);
+            // Act
+            var result = await controller.Create(producto);
 
-        // Assert
-        var redirect = Assert.IsType<RedirectToActionResult>(result);
-        Assert.Equal("Index", redirect.ActionName);
+            // Assert
+            var redirect = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Index", redirect.ActionName);
+        }
     }
-}
 }

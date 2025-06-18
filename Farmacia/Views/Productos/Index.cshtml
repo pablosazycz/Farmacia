@@ -1,99 +1,75 @@
 ﻿@model IEnumerable<Farmacia.Models.Producto>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Productos";
 }
 
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table" id="example">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.NombreComercial)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Laboratorio)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FormaFarmaceutica)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CantidadPresentacion)
-            </th>
-           
-            <th>
-                @Html.DisplayNameFor(model => model.CodigoBarras)
-            </th>
-          
-            <th>
-                @Html.DisplayNameFor(model => model.Activo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FechaAlta)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FechaBaja)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Droga)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.NombreComercial)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Laboratorio)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FormaFarmaceutica)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CantidadPresentacion)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CodigoBarras)
-            </td>
-           
-            <td>
-                @Html.DisplayFor(modelItem => item.Activo)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FechaAlta)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FechaBaja)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Droga.NombreCompleto)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="container my-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h3 class="mb-0"><i class="bi bi-box-seam"></i> Productos</h3>
+            <a asp-action="Create" class="btn btn-success"><i class="bi bi-plus-circle"></i> Nuevo Producto</a>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped align-middle" id="tablaProductos">
+                <thead class="table-light">
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.NombreComercial)</th>
+                        <th>@Html.DisplayNameFor(model => model.Laboratorio)</th>
+                        <th>@Html.DisplayNameFor(model => model.FormaFarmaceutica)</th>
+                        <th>@Html.DisplayNameFor(model => model.CantidadPresentacion)</th>
+                        <th>@Html.DisplayNameFor(model => model.CodigoBarras)</th>
+                        <th>@Html.DisplayNameFor(model => model.Activo)</th>
+                        <th>@Html.DisplayNameFor(model => model.FechaAlta)</th>
+                        <th>@Html.DisplayNameFor(model => model.FechaBaja)</th>
+                        <th>@Html.DisplayNameFor(model => model.Droga)</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.NombreComercial</td>
+                            <td>@item.Laboratorio</td>
+                            <td>@item.FormaFarmaceutica</td>
+                            <td>@item.CantidadPresentacion</td>
+                            <td>@item.CodigoBarras</td>
+                            <td>
+                                @if (item.Activo)
+                                {
+                                    <span class="badge bg-success">Activo</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Inactivo</span>
+                                }
+                            </td>
+                            <td>@item.FechaAlta?.ToShortDateString()</td>
+                            <td>@item.FechaBaja?.ToShortDateString()</td>
+                            <td>@item.Droga?.NombreCompleto</td>
+                            <td>
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary me-1"><i class="bi bi-pencil"></i></a>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info me-1"><i class="bi bi-info-circle"></i></a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <script>
         $(document).ready(function () {
-            $('#example').DataTable({
+            $('#tablaProductos').DataTable({
                 language: {
                     url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
                 },
                 pageLength: 10,
-                order: [[0, 'desc']] // Ordena por la columna Fecha de forma descendente
+                order: [[0, 'asc']]
             });
         });
     </script>

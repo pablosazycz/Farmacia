@@ -14,8 +14,8 @@ namespace Farmacia.Interfaces
         Task CanjearPuntosAsync(int clienteId, int puntos, string motivo, int? promocionId = null, int? ventaId = null);
         Task<int> ObtenerSaldoPuntosAsync(int clienteId);
         Task<List<ClientePunto>> ObtenerHistorialPuntosAsync(int clienteId);
-      
+
         Task<List<Cliente>> BuscarClientesAsync(string term);
-        
+
     }
 }

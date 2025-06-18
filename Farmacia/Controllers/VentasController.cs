@@ -1,10 +1,8 @@
 ﻿using Farmacia.Data;
 using Farmacia.Interfaces;
 using Farmacia.Models;
-using Farmacia.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 public class VentasController : Controller
 {
@@ -89,7 +87,7 @@ public class VentasController : Controller
         }
         catch (Exception ex)
         {
-           
+
             ModelState.AddModelError(string.Empty, ex.Message);
 
             List<Producto> producto = await _productoService.ObtenerProductosActivosAsync();

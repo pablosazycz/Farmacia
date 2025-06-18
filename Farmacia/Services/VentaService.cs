@@ -1,6 +1,6 @@
 ﻿using Farmacia.Data;
-using Farmacia.Models;
 using Farmacia.Interfaces;
+using Farmacia.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Farmacia.Services

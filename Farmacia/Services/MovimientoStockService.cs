@@ -25,7 +25,15 @@ namespace Farmacia.Services
             userManager = _UserManager;
 
         }
-
+        public async Task<MovimientoStock?> ObtenerPorIdAsync(int id)
+        {
+            return await _context.MovimientosStock
+                .Include(m => m.Droga)
+                .Include(m => m.Producto)
+                .Include(m => m.Lote)
+                .Include(m => m.Usuario)
+                .FirstOrDefaultAsync(m => m.Id == id);
+        }
         //public async Task<MovimientoStock> CrearMovimientoAsync(MovimientoStock movimiento)
         //{
 
@@ -164,7 +172,7 @@ namespace Farmacia.Services
                             FechaVencimiento = movimiento.FechaVencimiento,
                             Cantidad = movimiento.Cantidad,
                             ProductoId = (int)movimiento.ProductoId,
-                            PrecioCompra=movimiento.PrecioCompra
+                            PrecioCompra = movimiento.PrecioCompra
                         };
                         _context.Lotes.Add(nuevoLote);
                         await _context.SaveChangesAsync(); // para obtener el Id
@@ -187,7 +195,7 @@ namespace Farmacia.Services
                         movimiento.LoteId = loteExistente.Id;
                     }
                     int unidades = movimiento.Cantidad * producto.CantidadPresentacion;
-                    droga.Stock +=unidades;
+                    droga.Stock += unidades;
                     _context.Drogas.Update(droga);
                     break;
 
@@ -235,7 +243,7 @@ namespace Farmacia.Services
 
             return movimiento;
         }
-            
+
 
         public async Task<List<MovimientoStock>> ObtenerMovimientosPorDrogaIdAsync(int drogaId)
         {
@@ -269,8 +277,8 @@ namespace Farmacia.Services
             return await _context.MovimientosStock
                         .Include(m => m.Droga)
                         .Include(m => m.Lote)
-                        .Include(m=>m.Usuario)
-                        .Include(m=>m.Producto)
+                        .Include(m => m.Usuario)
+                        .Include(m => m.Producto)
                         .ToListAsync();
         }
     }

@@ -1,5 +1,4 @@
 ﻿using Farmacia.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace Farmacia.Interfaces
 {
@@ -20,7 +19,7 @@ namespace Farmacia.Interfaces
         Task<List<(Producto producto, int cantidadVendida, int stockActual)>> ObtenerProductosAltaRotacionConStockAsync(DateTime desde, DateTime hasta, int top);
 
         Task<List<Producto>> ObtenerProductosParaReposicionAsync();
-        Task<List<Producto>> ObtenerProductosParaPromocionAsync(int diasAVencer , int stockAlto );
+        Task<List<Producto>> ObtenerProductosParaPromocionAsync(int diasAVencer, int stockAlto);
         Task<List<(Producto producto, int cantidadVendida)>> ObtenerReporteVentasPorProductoAsync(DateTime desde, DateTime hasta);
         Task<List<Producto>> BuscarProductosAsync(string term);
 

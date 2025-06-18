@@ -1,16 +1,14 @@
-using System.Diagnostics;
-using System.Security.Claims;
-using AspNetCoreGeneratedDocument;
 using Farmacia.Interfaces;
 using Farmacia.Models;
-using Farmacia.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
+using System.Security.Claims;
 
 namespace Farmacia.Controllers
 {
-   // [Authorize]
+    // [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

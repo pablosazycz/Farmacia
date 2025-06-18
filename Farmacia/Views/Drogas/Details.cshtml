@@ -1,72 +1,41 @@
 ﻿@model Farmacia.Models.Droga
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalle de Droga";
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>Droga</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Nombre)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Nombre)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Concentracion)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Concentracion)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Stock)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Stock)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StockMinimo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StockMinimo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StockMaximo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StockMaximo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.RequiereReceta)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.RequiereReceta)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Activo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Activo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FechaAlta)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FechaAlta)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FechaBaja)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FechaBaja)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">Detalle de Droga Genérica</h4>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Nombre</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.Nombre)</dd>
+                    <dt class="col-sm-4">Concentración</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.Concentracion)</dd>
+                    <dt class="col-sm-4">Stock</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.Stock)</dd>
+                    <dt class="col-sm-4">Stock Mínimo</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.StockMinimo)</dd>
+                    <dt class="col-sm-4">Stock Máximo</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.StockMaximo)</dd>
+                    <dt class="col-sm-4">Requiere Receta</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.RequiereReceta)</dd>
+                    <dt class="col-sm-4">Activo</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.Activo)</dd>
+                    <dt class="col-sm-4">Fecha Alta</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.FechaAlta)</dd>
+                    <dt class="col-sm-4">Fecha Baja</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.FechaBaja)</dd>
+                </dl>
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-warning">Editar</a>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Volver al listado</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
