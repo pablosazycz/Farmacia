@@ -164,14 +164,14 @@ namespace Farmacia.Services
                             FechaVencimiento = movimiento.FechaVencimiento,
                             Cantidad = movimiento.Cantidad,
                             ProductoId = (int)movimiento.ProductoId,
-                            PrecioCompra=movimiento.Lote.PrecioCompra
+                            PrecioCompra=movimiento.PrecioCompra
                         };
                         _context.Lotes.Add(nuevoLote);
                         await _context.SaveChangesAsync(); // para obtener el Id
 
                         decimal porcentajeGanancia = 0.30m; // 30%
                         producto.PrecioUnitario = Math.Round(nuevoLote.PrecioCompra * (1 + porcentajeGanancia), 2);
-                        if (movimiento.Lote.PrecioCompra <= 0)
+                        if (movimiento.PrecioCompra <= 0)
                             throw new ArgumentException("El precio de compra debe ser mayor a cero.");
                         _context.Productos.Update(producto);
                         await _context.SaveChangesAsync();

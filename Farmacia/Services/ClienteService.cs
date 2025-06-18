@@ -14,6 +14,22 @@ namespace Farmacia.Services
             _context = context;
         }
 
+        public async Task<List<Cliente>> BuscarClientesAsync(string term)
+        {
+            if (string.IsNullOrWhiteSpace(term))
+                return new List<Cliente>();
+
+            return await _context.Clientes
+                .Where(c =>
+                    c.Nombre.Contains(term) ||
+                    c.Apellido.Contains(term) ||
+                    c.Dni.Contains(term)
+                )
+                .OrderBy(c => c.Nombre)
+                .Take(20)
+                .ToListAsync();
+        }
+
         public async Task<List<Cliente>> ObtenerClientesAsync()
         {
             return await _context.Clientes.ToListAsync();
@@ -91,7 +107,7 @@ namespace Farmacia.Services
                 .ToListAsync();
         }
 
-
+     
 
     }
 }

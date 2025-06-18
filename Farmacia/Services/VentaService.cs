@@ -12,12 +12,14 @@ namespace Farmacia.Services
         private readonly ApplicationDbContext _context;
         private readonly IMovimientoStockService _movimientoService;
         private readonly IClienteService _clienteService;
+        public readonly ILoteService _loteService;
 
-        public VentaService(ApplicationDbContext context, IMovimientoStockService movimientoService, IClienteService clienteService)
+        public VentaService(ApplicationDbContext context, IMovimientoStockService movimientoService, IClienteService clienteService, ILoteService loteService)
         {
             _context = context;
             _movimientoService = movimientoService;
             _clienteService = clienteService;
+            _loteService = loteService;
         }
 
 
@@ -110,6 +112,8 @@ namespace Farmacia.Services
                 lote.Cantidad -= detalle.Cantidad;
                 droga.Stock -= detalle.Cantidad * producto.CantidadPresentacion;
 
+
+
                 // Registrar movimiento de stock
                 var movimiento = new MovimientoStock
                 {
@@ -155,7 +159,6 @@ namespace Farmacia.Services
             throw new NotImplementedException();
         }
 
-
         public async Task<Venta> CrearVentaAsync(Venta venta, int? promocionId = null)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -163,25 +166,59 @@ namespace Farmacia.Services
             try
             {
                 venta.Fecha = DateTime.Now;
-                venta.Total = venta.DetallesVenta.Sum(d => d.Subtotal);
+
+                // Validación de stock y precios
+                foreach (var detalle in venta.DetallesVenta)
+                {
+                    var producto = await _context.Productos.FindAsync(detalle.ProductoId);
+                    if (producto == null)
+                        throw new Exception($"Producto con ID {detalle.ProductoId} no encontrado.");
+
+                    // Validar stock suficiente SOLO en el lote seleccionado
+                    var lote = await _context.Lotes
+                        .FirstOrDefaultAsync(l => l.ProductoId == detalle.ProductoId && l.CodigoLote == detalle.CodigoLote);
+
+                    if (lote == null)
+                        throw new Exception($"No se encontró el lote '{detalle.CodigoLote}' para el producto '{producto.NombreComercial}'.");
+
+                    if (lote.Cantidad < detalle.Cantidad)
+                        throw new Exception($"No hay stock suficiente en el lote '{detalle.CodigoLote}' para el producto '{producto.NombreComercial}'. Stock disponible: {lote.Cantidad}.");
+                }
+
+                // Recalcula los subtotales y el total en el backend
+                foreach (var detalle in venta.DetallesVenta)
+                {
+                    var producto = await _context.Productos.FindAsync(detalle.ProductoId);
+                    if (producto == null)
+                        throw new Exception("Producto no encontrado");
+
+                    detalle.PrecioUnitario = producto.PrecioUnitario;
+                    detalle.Subtotal = detalle.Cantidad * detalle.PrecioUnitario;
+                }
 
                 // 1. Consultar puntos del cliente
                 int puntosCliente = await _clienteService.ObtenerSaldoPuntosAsync(venta.ClienteId);
 
                 // 2. Buscar la mejor promoción disponible según puntos
-                var promociones = await _context.Promociones
-                    .Where(p => p.Activa && p.CantidadMinima.HasValue && p.CantidadMinima <= puntosCliente)
-                    .OrderByDescending(p => p.Descuento)
-                    .ToListAsync();
+                Promocion? promo = null;
+                if (promocionId.HasValue)
+                {
+                    promo = await _context.Promociones
+                        .FirstOrDefaultAsync(p => p.Id == promocionId.Value && p.Activa && p.CantidadMinima <= puntosCliente);
+                }
 
-                Promocion? promo = promociones.FirstOrDefault();
+                venta.Total = venta.DetallesVenta.Sum(d => d.Subtotal);
 
                 if (promo != null)
                 {
-                    // Aplica la mejor promoción
-                    var descuento = venta.Total * (promo.Descuento / 100m);
+                    // Aplica la promoción seleccionada
+                    var descuento = venta.Total * promo.Descuento;
                     venta.DescuentoAplicado = descuento;
                     venta.Total -= descuento;
+                }
+                else
+                {
+                    venta.DescuentoAplicado = 0;
                 }
 
                 _context.Ventas.Add(venta);
@@ -197,20 +234,44 @@ namespace Farmacia.Services
                         FechaAplicacion = DateTime.Now,
                         VentaId = venta.Id
                     };
+
+                    // Descontar puntos por la promoción (registra movimiento negativo en ClientePuntos)
+                    if (promo.CantidadMinima > 0)
+                    {
+                        await _clienteService.CanjearPuntosAsync(
+                        venta.ClienteId,
+                        promo.CantidadMinima.Value,
+                        $"Canje por promoción: {promo.Nombre}",
+                        promo.Id,
+                        venta.Id
+                         );
+                    }
+
+
                     _context.ClientePromociones.Add(clientePromocion);
                     await _context.SaveChangesAsync();
                 }
 
+                // Descontar stock y registrar movimiento de stock por el lote seleccionado
                 foreach (var detalle in venta.DetallesVenta)
                 {
+                    var lote = await _context.Lotes
+                        .FirstOrDefaultAsync(l => l.ProductoId == detalle.ProductoId && l.CodigoLote == detalle.CodigoLote);
+
+                    if (lote == null || lote.Cantidad < detalle.Cantidad)
+                        throw new Exception($"No hay stock suficiente en el lote '{detalle.CodigoLote}' para el producto.");
+
+
                     var movimiento = new MovimientoStock
                     {
                         ProductoId = detalle.ProductoId,
                         DrogaId = await ObtenerDrogaIdPorProducto(detalle.ProductoId),
                         Cantidad = detalle.Cantidad,
-                        CodigoLote = await ObtenerLoteDisponible(detalle.ProductoId, detalle.Cantidad),
+                        CodigoLote = detalle.CodigoLote,
                         TipoMovimiento = TipoMovimiento.Venta,
-                        UsuarioId = venta.UsuarioId
+                        UsuarioId = venta.UsuarioId,
+                        Fecha = DateTime.Now,
+                        VentaId = venta.Id
                     };
 
                     await _movimientoService.CrearMovimientoAsync(movimiento);
@@ -233,7 +294,6 @@ namespace Farmacia.Services
                 throw;
             }
         }
-
         private async Task<int> ObtenerDrogaIdPorProducto(int productoId)
         {
             var producto = await _context.Productos.FindAsync(productoId);

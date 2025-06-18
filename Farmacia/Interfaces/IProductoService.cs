@@ -22,7 +22,7 @@ namespace Farmacia.Interfaces
         Task<List<Producto>> ObtenerProductosParaReposicionAsync();
         Task<List<Producto>> ObtenerProductosParaPromocionAsync(int diasAVencer , int stockAlto );
         Task<List<(Producto producto, int cantidadVendida)>> ObtenerReporteVentasPorProductoAsync(DateTime desde, DateTime hasta);
-
+        Task<List<Producto>> BuscarProductosAsync(string term);
 
     }
 }

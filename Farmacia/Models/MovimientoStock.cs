@@ -25,7 +25,7 @@ namespace Farmacia.Models
         [StringLength(500, ErrorMessage = "Las observaciones no pueden superar los 500 caracteres.")]
         public string Observaciones { get; set; }
 
-
+        public decimal PrecioCompra { get; set; }
         public string UsuarioId { get; set; }
 
         [ForeignKey("UsuarioId")]

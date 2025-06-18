@@ -24,6 +24,26 @@ namespace Farmacia.Controllers
             _drogaService = drogaService;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Buscar(string term)
+        {
+            var productos = await _productoService.BuscarProductosAsync(term);
+
+            var resultado = productos.Select(p => new
+            {
+                id = p.Id,
+                text = p.NombreComercial,
+                descripcion = $" [{p.TipoPresentacion}]"
+                + (p.CantidadPresentacion > 0 ? $" [{p.CantidadPresentacion}]" : "")
+               + (p.Droga != null && !string.IsNullOrEmpty(p.Droga.Nombre) ? $" [{p.Droga.Nombre}]" : "")
+               + (p.Droga != null && !string.IsNullOrEmpty(p.Droga.Concentracion) ? $" [{p.Droga.Concentracion}]" : "")
+               + $" [${p.PrecioUnitario:F2}]",
+                precioUnitario = p.PrecioUnitario
+            });
+
+
+            return Json(new { results = resultado });
+        }
 
         // GET: Productos
         public async Task<IActionResult> Index()
@@ -50,7 +70,7 @@ namespace Farmacia.Controllers
         }
 
         // GET: Productos/Create
-        public async Task<IActionResult>  Create()
+        public async Task<IActionResult> Create()
         {
             List<Droga> drogas = await _drogaService.ObtenerDrogasActivasAsync();
             ViewBag.Drogas = new SelectList(drogas, "Id", "NombreCompleto");

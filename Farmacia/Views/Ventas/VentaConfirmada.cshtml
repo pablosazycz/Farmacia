@@ -1,0 +1,14 @@
+﻿@{
+    ViewData["Title"] = "Venta confirmada";
+    var ventaId = ViewBag.VentaId;
+}
+<div class="alert alert-success">
+    ¡Venta registrada correctamente!
+</div>
+<script>
+    window.open('@Url.Action("Ticket", "Ventas", new { id = ventaId })', '_blank');
+    // Opcional: redirige a la lista de ventas o a donde quieras
+    setTimeout(function() {
+        window.location.href = '@Url.Action("Index", "Ventas")';
+    }, 1000);
+</script>

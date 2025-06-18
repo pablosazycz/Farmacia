@@ -21,6 +21,21 @@ namespace Farmacia.Controllers
             return View(clientes);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Buscar(string term)
+        {
+            var clientes = await _clienteService.BuscarClientesAsync(term);
+
+            var resultado = clientes.Select(c => new
+            {
+                id = c.Id,
+                text = c.Nombre + " " + c.Apellido + " (" + c.Dni + ")"
+            });
+
+          
+            return Json(new { results = resultado });
+        }
+
         // GET: Clientes/Details/5
         public async Task<IActionResult> Details(int id)
         {

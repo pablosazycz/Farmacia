@@ -40,7 +40,8 @@ namespace Farmacia.Tests.Test
 
             var mockMov = new Mock<IMovimientoStockService>();
             var mockCliente = new Mock<IClienteService>();
-            var service = new VentaService(context, mockMov.Object, mockCliente.Object);
+            var mockLote = new Mock<ILoteService>();
+            var service = new VentaService(context, mockMov.Object, mockCliente.Object, mockLote.Object);
 
             var venta = new Venta
             {

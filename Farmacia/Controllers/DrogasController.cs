@@ -147,5 +147,13 @@ namespace Farmacia.Controllers
             }
             return View(productos);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Buscar(string term)
+        {
+            var drogas = await _drogaService.BuscarDrogasAsync(term);
+            var resultado = drogas.Select(d => new { id = d.Id, text = d.NombreCompleto });
+            return Json(new { results = resultado });
+        }
     }
 }

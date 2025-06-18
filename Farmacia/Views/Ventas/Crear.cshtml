@@ -2,81 +2,120 @@
 
 @{
     ViewData["Title"] = "Nueva Venta";
-    var productos = ViewBag.Productos as List<Farmacia.Models.Producto>;
-    var clientes = ViewBag.Clientes as List<Farmacia.Models.Cliente>;
     var promociones = ViewBag.Promociones as List<Farmacia.Models.Promocion>;
+    var clienteId = Model?.ClienteId ?? 0;
+    var clienteNombreCompleto = ViewBag.ClienteNombreCompleto as string ?? "";
 }
 
-<h2>Nueva Venta</h2>
-
-<form asp-action="Crear" method="post">
-    <div class="form-group">
-        <label asp-for="ClienteId">Cliente</label>
-        <select asp-for="ClienteId" class="form-control" asp-items="@(new SelectList(clientes, "Id", "Nombre"))">
-            <option value="">Seleccione un cliente</option>
-        </select>
-    </div>
-    <div>
-        <strong>Saldo de puntos:</strong> <span id="saldoPuntos">0</span>
-    </div>
-    <hr />
-
-    <div class="form-group">
-        <label for="PromocionId">Promoción</label>
-        <select id="PromocionId" name="PromocionId" class="form-control">
-            <option value="">Sin promoción</option>
-            @if (promociones != null)
+<div class="container my-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0"><i class="bi bi-cart-plus"></i> Nueva Venta</h3>
+        </div>
+        <div class="card-body">
+            @if (!ViewData.ModelState.IsValid && ViewData.ModelState.Values.Any(v => v.Errors.Count > 0))
             {
-                foreach (var promo in promociones)
-                {
-                    <option value="@promo.Id">@promo.Nombre (@(promo.Descuento)%)</option>
-                }
+                @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
             }
-        </select>
+            <form asp-action="Crear" method="post" autocomplete="off">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="clienteInput" class="form-label">Cliente</label>
+                        <select id="clienteInput" name="ClienteId" class="form-select" style="width:100%" required>
+                            @if (clienteId > 0 && !string.IsNullOrEmpty(clienteNombreCompleto))
+                            {
+                                <option value="@clienteId" selected="selected">@clienteNombreCompleto</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-6 d-flex align-items-end">
+                        <div>
+                            <span class="fw-bold">Saldo de puntos:</span>
+                            <span id="saldoPuntos" class="badge bg-info text-dark ms-2">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4" />
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="PromocionId" class="form-label">Promoción</label>
+                        <select id="PromocionId" name="PromocionId" class="form-select">
+                            <option value="" data-descuento="0">Sin promoción</option>
+                            @if (promociones != null)
+                            {
+                                foreach (var promo in promociones)
+                                {
+                                    <option value="@promo.Id" data-descuento="@promo.Descuento.ToString(System.Globalization.CultureInfo.InvariantCulture)" data-minpuntos="@promo.CantidadMinima">
+                                        @promo.Nombre (@(promo.Descuento * 100)%) - Min: @promo.CantidadMinima pts
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <h5 class="mb-3"><i class="bi bi-bag-plus"></i> Detalles de la venta</h5>
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-6">
+                            <label for="drogaSelect" class="form-label">Buscar droga</label>
+                            <select id="drogaSelect" class="form-select" style="width:100%"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive mt-4">
+                    <table class="table table-bordered table-hover align-middle" id="tabla-detalles">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Producto</th>
+                                <th style="width:110px;">Cantidad</th>
+                                <th style="width:140px;">Precio Unitario</th>
+                                <th style="width:140px;">Subtotal</th>
+                                <th style="width:80px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Se agregarán dinámicamente filas -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-end align-items-center mt-3">
+                    <span class="fs-5 fw-bold me-2">Total:</span>
+                    <span id="totalVenta" class="fs-4 text-success">$0.00</span>
+                </div>
+                <div class="d-flex justify-content-end align-items-center mt-2">
+                    <span class="me-2">Descuento:</span>
+                    <span id="descuentoVenta" class="fs-5 text-primary">$0.00</span>
+                </div>
+                <div class="d-flex justify-content-end align-items-center mt-1">
+                    <span class="me-2">Total con descuento:</span>
+                    <span id="totalConDescuento" class="fs-4 text-success">$0.00</span>
+                </div>
+
+                <input type="hidden" asp-for="Total" />
+
+                <div class="d-flex justify-content-end mt-4">
+                    <button type="submit" class="btn btn-lg btn-primary">
+                        <i class="bi bi-check-circle"></i> Registrar Venta
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
+</div>
 
-    <h4>Detalles de la venta</h4>
-    <table class="table" id="tabla-detalles">
-        <thead>
-            <tr>
-                <th>Producto</th>
-                <th>Cantidad</th>
-                <th>Precio Unitario</th>
-                <th>Subtotal</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Se agregarán dinámicamente filas -->
-        </tbody>
-    </table>
-    <div class="form-group mt-3">
-        <label for="drogaSelect">Seleccionar droga genérica</label>
-        <select id="drogaSelect" class="form-control">
-            <option value="">Seleccione una droga</option>
-            @foreach (var droga in ViewBag.Drogas as List<Farmacia.Models.Droga>)
-            {
-                <option value="@droga.Id" data-requiere-receta="@(droga.RequiereReceta ? "true" : "false")">
-                    @droga.NombreCompleto
-                </option>
-            }
-        </select>
-    </div>
-    <div class="form-group mt-3">
-        <label>Total: $<span id="totalVenta">0.00</span></label>
-    </div>
-
-    <input type="hidden" asp-for="Total" />
-
-    <button type="submit" class="btn btn-primary">Registrar Venta</button>
-</form>
-
-<div class="modal fade" id="modalProductosRelacionados" data-fila-activa-id="" tabindex="-1" role="dialog" aria-labelledby="modalProductosRelacionadosLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+<!-- Modal para productos relacionados -->
+<div class="modal fade" id="modalProductosRelacionados" tabindex="-1" aria-labelledby="modalProductosRelacionadosLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalProductosRelacionadosLabel">Productos relacionados (orden FEFO)</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalProductosRelacionadosLabel">
+                    <i class="bi bi-box-seam"></i> Productos relacionados (orden FEFO)
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body" id="contenidoProductosRelacionados">
                 <!-- Aquí se cargará el contenido con AJAX -->
@@ -85,82 +124,106 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalRecetaObligatoria" tabindex="-1" role="dialog" aria-labelledby="modalRecetaObligatoriaLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalRecetaObligatoriaLabel">¡Atención!</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body">
-                Esta droga requiere receta médica obligatoria para su venta.
-            </div>
-            
-        </div>
-    </div>
-</div>
-
-
 @section Scripts {
     <script>
-        // Contador global para los índices de los detalles
-        var filaIndex = 0;
-
-        // Espera a que el DOM esté listo
-        $(function () {
-            // Validación antes de enviar el formulario
-            $('form[asp-action="Crear"]').on('submit', function (e) {
-                var filas = $('#tabla-detalles tbody tr');
-                if (filas.length === 0) {
-                    alert('Debe agregar al menos un producto a la venta.');
-                    e.preventDefault();
-                    return false;
-                }
-            });
-
-            // Actualiza el saldo de puntos al cambiar el cliente
-            $('#ClienteId').change(function () {
-                var clienteId = $(this).val();
-                $.get('/Ventas/ObtenerSaldoPuntos', { clienteId: clienteId }, function (data) {
-                    $('#saldoPuntos').text(data.saldo);
+        // Select2 para clientes
+        $('#clienteInput').select2({
+            placeholder: 'Buscar cliente...',
+            minimumInputLength: 2,
+            ajax: {
+                url: '/Clientes/Buscar',
+                dataType: 'json',
+                delay: 250,
+                data: params => ({ term: params.term }),
+                processResults: data => data
+            }
+        }).on('select2:select', function (e) {
+            $.get('/Ventas/ObtenerSaldoPuntos', { clienteId: e.params.data.id }, function (data) {
+                $('#saldoPuntos').text(data.saldo);
+                $('#PromocionId option').each(function () {
+                    var minPuntos = parseInt($(this).data('minpuntos') || 0);
+                    if (minPuntos > data.saldo) {
+                        $(this).hide();
+                    } else {
+                        $(this).show();
+                    }
                 });
-            });
-
-            // Carga productos relacionados al seleccionar una droga
-            $('#drogaSelect').on('change', function () {
-                  var selectedOption = $(this).find('option:selected');
-                    var requiereReceta = selectedOption.data('requiere-receta');
-                    if (requiereReceta === true || requiereReceta === "true") {
-            $('#modalRecetaObligatoria').modal('show');
-        }
-                var drogaId = $(this).val();
-                if (drogaId) {
-                    $.ajax({
-                        url: `/Productos/ProductosPorDroga?id=${drogaId}`,
-                        type: 'GET',
-                        success: function (partialHtml) {
-                            $('#contenidoProductosRelacionados').html(partialHtml);
-                            $('#modalProductosRelacionados').modal('show');
-                        },
-                        error: function () {
-                            alert("Error al cargar los productos relacionados.");
-                        }
-                    });
-                }
+                $('#PromocionId').val('');
+                actualizarDescuento();
             });
         });
 
-        // Actualiza el precio unitario y el subtotal al cambiar el producto
-        function actualizarPrecio(selectElement) {
-            var selectedId = $(selectElement).val();
-            var producto = productos.find(p => p.id == selectedId);
-            var $row = $(selectElement).closest('tr');
-
-            if (producto) {
-                $row.find('.precio-unitario').val(producto.precioUnitario.toFixed(2));
-                $row.find('[name$=".ProductoId"]').val(producto.id);
-                actualizarSubtotal(selectElement);
+        // Si hay cliente seleccionado tras postback, actualiza saldo de puntos
+        $(document).ready(function () {
+            var clienteId = $('#clienteInput').val();
+            if (clienteId) {
+                $.get('/Ventas/ObtenerSaldoPuntos', { clienteId: clienteId }, function (data) {
+                    $('#saldoPuntos').text(data.saldo);
+                });
             }
+            actualizarDescuento();
+        });
+
+        // Select2 para drogas
+        $('#drogaSelect').select2({
+            placeholder: 'Buscar droga...',
+            minimumInputLength: 2,
+            ajax: {
+                url: '/Drogas/Buscar',
+                dataType: 'json',
+                delay: 250,
+                data: params => ({ term: params.term }),
+                processResults: data => data
+            }
+        }).on('select2:select', function (e) {
+            var drogaId = e.params.data.id;
+            $.get('/Productos/ProductosPorDroga', { id: drogaId }, function (html) {
+                $('#contenidoProductosRelacionados').html(html);
+                $('#modalProductosRelacionados').modal('show');
+            });
+        });
+
+        // Función global para agregar producto desde el modal
+        function seleccionarProductoDesdeSugerencia(productoId, productoNombre, precioUnitario, codigoLote) {
+            if (typeof precioUnitario === "string") {
+                precioUnitario = precioUnitario.replace(',', '.');
+            }
+            agregarProductoADetalle(productoId, productoNombre, parseFloat(precioUnitario), codigoLote);
+            $('#modalProductosRelacionados').modal('hide');
+            $('#drogaSelect').val(null).trigger('change');
+        }
+
+        // Lógica para agregar productos a la tabla de detalles
+        var filaIndex = 0;
+        function agregarProductoADetalle(productoId, productoNombre, precioUnitario, codigoLote) {
+            var $tbody = $('#tabla-detalles tbody');
+            var rowHtml = `
+                <tr data-fila-id="${filaIndex}">
+                    <td>
+                        <input type="hidden" name="DetallesVenta[${filaIndex}].ProductoId" value="${productoId}" />
+                        <input type="hidden" name="DetallesVenta[${filaIndex}].CodigoLote" value="${codigoLote}" />
+                        ${productoNombre} <span class="badge bg-secondary">${codigoLote}</span>
+                    </td>
+                    <td>
+                        <input type="number" class="form-control cantidad-input" min="1" value="1" name="DetallesVenta[${filaIndex}].Cantidad" oninput="actualizarSubtotal(this)" />
+                    </td>
+                    <td>
+                        <input type="number" step="0.01" class="form-control precio-unitario" value="${precioUnitario.toFixed(2)}" name="DetallesVenta[${filaIndex}].PrecioUnitario" readonly />
+                    </td>
+                    <td>
+                        <input type="number" step="0.01" class="form-control subtotal" value="${precioUnitario.toFixed(2)}" name="DetallesVenta[${filaIndex}].Subtotal" readonly />
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger" onclick="$(this).closest('tr').remove(); calcularTotal(); actualizarDescuento();">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+            $tbody.append(rowHtml);
+            calcularTotal();
+            actualizarDescuento();
+            filaIndex++;
         }
 
         // Actualiza el subtotal al cambiar la cantidad
@@ -169,15 +232,12 @@
             var cantidad = parseFloat($row.find('.cantidad-input').val());
             var precio = parseFloat($row.find('.precio-unitario').val());
             var $subtotalInput = $row.find('.subtotal');
-            var $hiddenCantidad = $row.find('[name$=".Cantidad"]');
-
             if (!isNaN(cantidad) && !isNaN(precio)) {
                 var subtotal = cantidad * precio;
                 $subtotalInput.val(subtotal.toFixed(2));
-                $hiddenCantidad.val(cantidad);
             }
-
             calcularTotal();
+            actualizarDescuento();
         }
 
         // Calcula el total de la venta
@@ -186,34 +246,46 @@
             $('.subtotal').each(function () {
                 total += parseFloat($(this).val()) || 0;
             });
-            $('#totalVenta').text(total.toFixed(2));
+            $('#totalVenta').text('$' + total.toFixed(2));
             $('input[name="Total"]').val(total.toFixed(2));
         }
 
-        // Agrega un producto a la tabla de detalles
-        function seleccionarProductoDesdeSugerencia(productoId, productoNombre, precioUnitario) {
-            var $tbody = $('#tabla-detalles tbody');
-            var rowHtml = `
-                <tr data-fila-id="${filaIndex}">
-                    <td>
-                        <select class="form-control" onchange="actualizarPrecio(this)">
-                            <option value="${productoId}" selected>${productoNombre}</option>
-                        </select>
-                    </td>
-                    <td><input type="number" class="form-control cantidad-input" min="1" value="1" oninput="actualizarSubtotal(this)" /></td>
-                    <td><input type="text" class="form-control precio-unitario" value="${precioUnitario.toFixed(2)}" readonly /></td>
-                    <td><input type="text" class="form-control subtotal" value="${precioUnitario.toFixed(2)}" readonly /></td>
-                    <td><button type="button" class="btn btn-danger" onclick="$(this).closest('tr').remove(); calcularTotal();">Eliminar</button></td>
-                    <input type="hidden" name="DetallesVenta.Index" value="${filaIndex}" />
-                    <input type="hidden" name="DetallesVenta[${filaIndex}].ProductoId" value="${productoId}" />
-                    <input type="hidden" name="DetallesVenta[${filaIndex}].Cantidad" value="1" />
-                    <input type="hidden" name="DetallesVenta[${filaIndex}].PrecioUnitario" value="${precioUnitario}" />
-                </tr>
-            `;
-            $tbody.append(rowHtml);
-            calcularTotal();
-            $('#modalProductosRelacionados').modal('hide');
-            filaIndex++;
+        // Calcula y muestra el descuento y el total con descuento
+        function actualizarDescuento() {
+            var total = parseFloat($('input[name="Total"]').val()) || 0;
+            var descuento = 0;
+            var totalConDescuento = total;
+
+            var $promoSelected = $('#PromocionId option:selected');
+            var porcentajeDescuento = parseFloat($promoSelected.data('descuento')) || 0;
+
+            if (porcentajeDescuento > 0) {
+                descuento = total * porcentajeDescuento;
+                totalConDescuento = total - descuento;
+            }
+
+            $('#descuentoVenta').text('$' + descuento.toFixed(2));
+            $('#totalConDescuento').text('$' + totalConDescuento.toFixed(2));
         }
+
+        // Eventos para recalcular descuento
+        $('#PromocionId').on('change', actualizarDescuento);
+        $('#tabla-detalles').on('input', '.cantidad-input', actualizarDescuento);
+        //$('#tabla-detalles').on('DOMSubtreeModified', actualizarDescuento);
+
+        // Validación antes de enviar el formulario
+        $('form[asp-action="Crear"]').on('submit', function (e) {
+            var filas = $('#tabla-detalles tbody tr');
+            if (filas.length === 0) {
+                alert('Debe agregar al menos un producto a la venta.');
+                e.preventDefault();
+                return false;
+            }
+            if (!$('#clienteInput').val()) {
+                alert('Debe seleccionar un cliente.');
+                e.preventDefault();
+                return false;
+            }
+        });
     </script>
 }

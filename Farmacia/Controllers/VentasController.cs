@@ -60,9 +60,16 @@ public class VentasController : Controller
     {
         venta.Fecha = DateTime.Now;
         venta.UsuarioId = _userManager.GetUserId(User);
+
         if (venta.DetallesVenta == null || !venta.DetallesVenta.Any())
         {
             ModelState.AddModelError("", "Debe agregar al menos un producto a la venta.");
+        }
+
+        if (venta.ClienteId > 0)
+        {
+            var cliente = await _clienteService.ObtenerClientePorIdAsync(venta.ClienteId);
+            ViewBag.ClienteNombreCompleto = cliente != null ? $"{cliente.Nombre} {cliente.Apellido} ({cliente.Dni})" : "";
         }
 
         if (!ModelState.IsValid)
@@ -75,8 +82,30 @@ public class VentasController : Controller
             return View(venta);
         }
 
-        var ventaGuardada = await _ventaService.CrearVentaAsync(venta, PromocionId);
-        return RedirectToAction("Ticket", new { id = ventaGuardada.Id });
+        try
+        {
+            var ventaGuardada = await _ventaService.CrearVentaAsync(venta, PromocionId);
+            return RedirectToAction("VentaConfirmada", new { id = ventaGuardada.Id });
+        }
+        catch (Exception ex)
+        {
+           
+            ModelState.AddModelError(string.Empty, ex.Message);
+
+            List<Producto> producto = await _productoService.ObtenerProductosActivosAsync();
+            ViewBag.Productos = producto;
+            ViewBag.Clientes = _context.Clientes.ToList();
+            var promociones = await _promocionService.ObtenerPromocionesAsync();
+            ViewBag.Promociones = promociones.Where(p => p.Activa).ToList();
+
+            if (venta.ClienteId > 0)
+            {
+                var cliente = await _clienteService.ObtenerClientePorIdAsync(venta.ClienteId);
+                ViewBag.ClienteNombreCompleto = cliente != null ? $"{cliente.Nombre} {cliente.Apellido} ({cliente.Dni})" : "";
+            }
+
+            return View(venta);
+        }
     }
 
     public async Task<IActionResult> Details(int id)
@@ -149,6 +178,12 @@ public class VentasController : Controller
     {
         await _ventaService.EliminarVentaAsync(id);
         return RedirectToAction(nameof(Index));
+    }
+
+    public IActionResult VentaConfirmada(int id)
+    {
+        ViewBag.VentaId = id;
+        return View();
     }
 }
 

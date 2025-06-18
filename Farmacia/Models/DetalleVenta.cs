@@ -18,8 +18,9 @@ namespace Farmacia.Models
 
         public int Cantidad { get; set; }
 
+        [Column(TypeName = "decimal(18,2)")]
         public decimal PrecioUnitario { get; set; }
-
+        public string CodigoLote { get; set; }
 
         public decimal Subtotal { get; set; }
     }

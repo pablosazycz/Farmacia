@@ -107,6 +107,27 @@ namespace Farmacia.Services
                 .ToListAsync();
         }
 
+        public async Task<List<Droga>> BuscarDrogasAsync(string term)
+        {
+            if (string.IsNullOrWhiteSpace(term))
+                return new List<Droga>();
 
+            // Filtra en SQL solo por campos mapeados
+            var query = _context.Drogas
+                .Where(d => d.Nombre.Contains(term) && d.Activo)
+                .OrderBy(d => d.Nombre)
+                .Take(50); // Trae más para filtrar luego
+
+            var drogas = await query.ToListAsync();
+
+            // Ahora filtra en memoria por NombreCompleto
+            return drogas
+                .Where(d =>
+                    d.Nombre.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                    (!string.IsNullOrEmpty(d.NombreCompleto) && d.NombreCompleto.Contains(term, StringComparison.OrdinalIgnoreCase))
+                )
+                .Take(20)
+                .ToList();
+        }
     }
 }

@@ -13,6 +13,25 @@ namespace Farmacia.Services
             _context = context;
         }
 
+        public async Task<List<Producto>> BuscarProductosAsync(string term)
+        {
+            if (string.IsNullOrWhiteSpace(term))
+                return new List<Producto>();
+
+            return await _context.Productos
+                .Where(p =>
+                    p.Activo &&
+                    (
+                        p.NombreComercial.Contains(term) ||
+                        (!string.IsNullOrEmpty(p.CodigoBarras) && p.CodigoBarras.Contains(term))
+                    )
+                )
+                .Include(p=>p.Droga)
+                .OrderBy(p => p.NombreComercial)
+                .Take(20)
+                .ToListAsync();
+        }
+
         public async Task<Producto> CrearProductoAsync(Producto producto)
         {
             producto.FechaAlta = DateTime.Now;
