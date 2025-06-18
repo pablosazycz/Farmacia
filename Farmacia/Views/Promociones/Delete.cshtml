@@ -1,0 +1,29 @@
+@model Farmacia.Models.Promocion
+
+@{
+    ViewData["Title"] = "Eliminar Promoción";
+}
+
+<div class="container my-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-danger text-white">
+            <h3 class="mb-0"><i class="bi bi-trash"></i> Eliminar Promoción</h3>
+        </div>
+        <div class="card-body">
+            <h5 class="mb-3">¿Estás seguro que deseas eliminar esta promoción?</h5>
+            <dl class="row">
+                <dt class="col-sm-4">Nombre</dt>
+                <dd class="col-sm-8">@Model.Nombre</dd>
+                <dt class="col-sm-4">Descuento</dt>
+                <dd class="col-sm-8">@Model.Descuento:P</dd>
+            </dl>
+            <form asp-action="Delete" method="post">
+                <input type="hidden" asp-for="Id" />
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-danger me-2"><i class="bi bi-trash"></i> Eliminar</button>
+                    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,54 @@
+@page "{userId?}"
+@model Farmacia.Areas.Identity.Pages.Admin.ManageRolesModel
+@{
+    ViewData["Title"] = "Gestionar Roles de Usuario";
+}
+
+<h2>Gestionar Roles de @Model.SelectedUser?.Email</h2>
+
+@if (Model.SelectedUser != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Rol</th>
+                <th>Asignado</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var role in Model.AllRoles)
+            {
+                bool hasRole = Model.UserRoles.Contains(role);
+                <tr>
+                    <td>@role</td>
+                    <td>
+                        @if (hasRole)
+                        {
+                            <span class="badge bg-success">Sí</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">No</span>
+                        }
+                    </td>
+                    <td>
+                        <form method="post" asp-page-handler="ChangeRole" style="display:inline">
+                            <input type="hidden" name="userId" value="@Model.SelectedUser.Id" />
+                            <input type="hidden" name="role" value="@role" />
+                            <input type="hidden" name="add" value="@(hasRole ? "false" : "true")" />
+                            <button type="submit" class="btn btn-sm @(hasRole ? "btn-danger" : "btn-success")">
+                                @(hasRole ? $"Quitar" : $"Asignar")
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <a asp-page="/Admin/ManageUsers" class="btn btn-secondary">Volver a la lista de usuarios</a>
+}
+else
+{
+    <div class="alert alert-warning">Usuario no encontrado.</div>
+}

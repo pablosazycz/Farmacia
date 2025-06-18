@@ -25,7 +25,7 @@ namespace Farmacia.Models
         [StringLength(500, ErrorMessage = "Las observaciones no pueden superar los 500 caracteres.")]
         public string Observaciones { get; set; }
 
-
+        public decimal PrecioCompra { get; set; }
         public string UsuarioId { get; set; }
 
         [ForeignKey("UsuarioId")]
@@ -46,6 +46,10 @@ namespace Farmacia.Models
 
         [ForeignKey("LoteId")]
         public Lote Lote { get; set; }
+
+        public int? VentaId { get; set; }
+        [ForeignKey("VentaId")]
+        public Venta Venta { get; set; }
     }
 
 
@@ -54,6 +58,7 @@ namespace Farmacia.Models
         Compra,       // Cuando se recibe un nuevo lote de medicamentos
         Venta,        // Cuando se vende un medicamento
         Reposicion,   // Cuando se hace una reposición de stock
-        Devolucion    // Cuando un cliente devuelve un medicamento
+        Devolucion,    // Cuando un cliente devuelve un medicamento
+        BajaPorVencimiento, //baja por vencimiento
     }
 }

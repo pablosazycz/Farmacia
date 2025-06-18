@@ -23,7 +23,7 @@ namespace Farmacia.Models
         [ForeignKey("UsuarioId")]
         public IdentityUser Usuario { get; set; }
 
-        public ICollection<DetalleVenta> DetallesVenta { get; set; }
+        public List<DetalleVenta> DetallesVenta { get; set; }
     }
 
 

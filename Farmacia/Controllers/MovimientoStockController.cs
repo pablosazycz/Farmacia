@@ -1,9 +1,9 @@
 ﻿using Farmacia.Data;
 using Farmacia.Interfaces;
 using Farmacia.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Identity;
 
 
 namespace Farmacia.Controllers
@@ -44,9 +44,15 @@ namespace Farmacia.Controllers
         }
 
         // GET: MovimientoStock/Details/5
-        public ActionResult Details(int id)
+        public async Task<IActionResult>  Details(int id)
         {
-            return View();
+            var movimiento = await _movimientoStockService.ObtenerPorIdAsync(id);
+
+            if (movimiento == null)
+            {
+                return NotFound();
+            }
+            return View(movimiento);
         }
 
         // GET: MovimientoStock/CrearCompra
@@ -102,7 +108,7 @@ namespace Farmacia.Controllers
             return View();
         }
 
-     
+
         // POST: MovimientoStock/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -165,5 +171,41 @@ namespace Farmacia.Controllers
                 return View();
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> AltaRotacion()
+        {
+            var desde = DateTime.Today.AddMonths(-1);
+            var hasta = DateTime.Today;
+            var productosAltaRotacion = await _productoService.ObtenerProductosAltaRotacionConStockAsync(desde, hasta, 10);
+            return View(productosAltaRotacion);
+        }
+
+        public async Task<IActionResult> SugerenciasReposicion()
+        {
+            var productosReposicion = await _productoService.ObtenerProductosParaReposicionAsync();
+            return View(productosReposicion);
+        }
+
+        public async Task<IActionResult> SugerenciasPromocion(int? diasAVencer, int? stockAlto)
+        {
+            int dias = diasAVencer ?? 30;
+            int stock = stockAlto ?? 10;
+            var productosPromocion = await _productoService.ObtenerProductosParaPromocionAsync(dias, stock);
+            ViewBag.DiasAVencer = dias;
+            ViewBag.StockAlto = stock;
+            return View(productosPromocion);
+        }
+
+        public async Task<IActionResult> ReporteVentasPorProducto(DateTime? desde, DateTime? hasta)
+        {
+            var fechaDesde = desde ?? DateTime.Today.AddMonths(-1);
+            var fechaHasta = hasta ?? DateTime.Today.AddDays(1);
+            var reporte = await _productoService.ObtenerReporteVentasPorProductoAsync(fechaDesde, fechaHasta);
+            ViewBag.FechaDesde = fechaDesde.ToString("yyyy-MM-dd");
+            ViewBag.FechaHasta = fechaHasta.ToString("yyyy-MM-dd");
+            return View(reporte);
+        }
+
     }
 }

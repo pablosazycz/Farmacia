@@ -1,0 +1,42 @@
+@model Farmacia.Models.Promocion
+
+@{
+    ViewData["Title"] = "Detalle de Promoción";
+}
+
+<div class="container my-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-info text-white">
+            <h3 class="mb-0"><i class="bi bi-info-circle"></i> Detalle de Promoción</h3>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-4">Nombre</dt>
+                <dd class="col-sm-8">@Model.Nombre</dd>
+                <dt class="col-sm-4">Descuento</dt>
+                <dd class="col-sm-8">@Model.Descuento:P</dd>
+                <dt class="col-sm-4">Tipo</dt>
+                <dd class="col-sm-8">@Model.Tipo</dd>
+                <dt class="col-sm-4">Cantidad Mínima</dt>
+                <dd class="col-sm-8">@Model.CantidadMinima</dd>
+                <dt class="col-sm-4">Periodo</dt>
+                <dd class="col-sm-8">@Model.Periodo</dd>
+                <dt class="col-sm-4">Activa</dt>
+                <dd class="col-sm-8">
+                    @if (Model.Activa)
+                    {
+                        <span class="badge bg-success">Sí</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">No</span>
+                    }
+                </dd>
+            </dl>
+            <div class="d-flex justify-content-end">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary me-2"><i class="bi bi-pencil"></i> Editar</a>
+                <a asp-action="Index" class="btn btn-secondary">Volver</a>
+            </div>
+        </div>
+    </div>
+</div>

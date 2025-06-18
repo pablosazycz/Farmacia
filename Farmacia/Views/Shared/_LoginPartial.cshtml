@@ -2,15 +2,67 @@
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 
-<ul class="navbar-nav">
+@{
+    // Determina si hay notificaciones activas
+    bool hayNotificaciones = !string.IsNullOrEmpty(ViewBag.MensajeProximos)
+        || !string.IsNullOrEmpty(ViewBag.MensajeVencidos)
+        || !string.IsNullOrEmpty(ViewBag.AlertaStock);
+}
+
+<li class="nav-item dropdown">
+    <a class="nav-link position-relative" href="#" id="notificacionesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="bi bi-bell" style="font-size: 1.2rem;"></i>
+        @if (hayNotificaciones)
+        {
+            <span class="position-absolute top-1 start-90 translate-middle badge rounded-pill bg-danger">
+                !
+                <span class="visually-hidden">Notificaciones</span>
+            </span>
+        }
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificacionesDropdown" style="min-width: 300px;">
+        @if (!string.IsNullOrEmpty(ViewBag.MensajeProximos))
+        {
+            <li>
+                <a class="dropdown-item text-warning" href="@Url.Action("ProxAVencer", "Home")">
+                    <i class="bi bi-exclamation-triangle"></i> @ViewBag.MensajeProximos
+                </a>
+            </li>
+        }
+        @if (!string.IsNullOrEmpty(ViewBag.MensajeVencidos))
+        {
+            <li>
+                <a class="dropdown-item text-danger" href="@Url.Action("Vencidos", "Home")">
+                    <i class="bi bi-x-octagon"></i> @ViewBag.MensajeVencidos
+                </a>
+            </li>
+        }
+        @if (!string.IsNullOrEmpty(ViewBag.AlertaStock))
+        {
+            <li>
+                <a class="dropdown-item text-warning" href="@Url.Action("StockCritico", "Home")">
+                    <i class="bi bi-exclamation-circle"></i> @ViewBag.AlertaStock
+                </a>
+            </li>
+        }
+        @if (!hayNotificaciones)
+        {
+            <li>
+                <span class="dropdown-item text-muted">Sin notificaciones</span>
+            </li>
+        }
+    </ul>
+</li>
+
 @if (SignInManager.IsSignedIn(User))
 {
     <li class="nav-item">
-        <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
+        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hola @User.Identity?.Name!</a>
     </li>
+   
     <li class="nav-item">
-        <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
+        <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+            <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
         </form>
     </li>
 }
@@ -23,4 +75,3 @@ else
         <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
     </li>
 }
-</ul>

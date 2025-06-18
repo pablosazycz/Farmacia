@@ -1,0 +1,80 @@
+﻿@model IEnumerable<Farmacia.Models.Producto>
+
+@{
+    ViewData["Title"] = "Stock Crítico";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-11">
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-header bg-danger text-white d-flex align-items-center">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <h4 class="mb-0">Productos con Stock Crítico</h4>
+            </div>
+            <div class="card-body">
+                @if (!Model.Any())
+                {
+                    <div class="alert alert-success shadow-sm">
+                        <i class="bi bi-check-circle-fill"></i>
+                        No hay productos con stock crítico.
+                    </div>
+                }
+                else
+                {
+                    <table class="table table-hover align-middle" id="tablaStockCritico">
+                        <thead class="table-danger">
+                            <tr>
+                                <th>Nombre Comercial</th>
+                                <th>Laboratorio</th>
+                                <th>Genérico</th>
+                                <th>Presentación</th>
+                                <th>Stock Actual</th>
+                                <th>Estado</th>
+                                <th>Precio Unitario</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var producto in Model)
+                            {
+                                <tr>
+                                    <td><strong>@producto.NombreComercial</strong></td>
+                                    <td>@producto.Laboratorio</td>
+                                    <td>@producto.Droga?.Nombre @producto.Droga?.Concentracion</td>
+                                    <td>@producto.PresentacionCompleta</td>
+                                    <td>
+                                        <span class="badge bg-danger fs-6">@producto.Lotes?.Sum(l => l.Cantidad)</span>
+                                    </td>
+                                    <td>
+                                        @if (producto.Activo)
+                                        {
+                                            <span class="badge bg-success">Activo</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Inactivo</span>
+                                        }
+                                    </td>
+                                    <td>$@producto.PrecioUnitario.ToString("N2")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#tablaStockCritico').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                },
+                pageLength: 10,
+                order: [[4, 'asc']]
+            });
+        });
+    </script>
+}

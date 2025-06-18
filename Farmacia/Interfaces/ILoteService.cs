@@ -13,5 +13,11 @@ namespace Farmacia.Interfaces
         Task<List<Lote>> ObtenerLotesPorProductoIdAsync(int productoId);
         Task<List<Lote>> ObtenerLotesPorVencimientoAsync(DateTime hastaFecha);
         Task<List<Lote>> ObtenerTodosLosLotesAsync();
+
+        Task<List<Lote>> ObtenerLotesProximosAVencerAsync(int dias = 30);
+        Task<List<Lote>> ObtenerLotesVencidosAsync();
+
+        Task DarDeBajaLotesVencidosAsync(string usuarioId);
+        Task DarDeBajaLoteVencidoAsync(int loteId, string usuarioId);
     }
 }

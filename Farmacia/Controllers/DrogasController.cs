@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using Farmacia.Data;
+﻿using Farmacia.Interfaces;
 using Farmacia.Models;
-using Farmacia.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Farmacia.Controllers
 
@@ -140,11 +133,20 @@ namespace Farmacia.Controllers
             List<Producto> productos = await _productoService.ObtenerProductosPorDrogaAsync(id);
             Droga droga = await _drogaService.ObtenerDrogaPorIdAsync(id);
             ViewData["Droga"] = droga.NombreCompleto;
+
             if (productos == null)
             {
                 return NotFound();
             }
             return View(productos);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Buscar(string term)
+        {
+            var drogas = await _drogaService.BuscarDrogasAsync(term);
+            var resultado = drogas.Select(d => new { id = d.Id, text = d.NombreCompleto });
+            return Json(new { results = resultado });
         }
     }
 }

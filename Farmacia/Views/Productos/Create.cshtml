@@ -1,61 +1,64 @@
 ﻿@model Farmacia.Models.Producto
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Nuevo Producto";
 }
 
-<h1>Create</h1>
-
-<h4>Producto</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="NombreComercial" class="control-label"></label>
-                <input asp-for="NombreComercial" class="form-control" />
-                <span asp-validation-for="NombreComercial" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Laboratorio" class="control-label"></label>
-                <input asp-for="Laboratorio" class="form-control" />
-                <span asp-validation-for="Laboratorio" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="FormaFarmaceutica" class="control-label"></label>
-                <input asp-for="FormaFarmaceutica" class="form-control" />
-                <span asp-validation-for="FormaFarmaceutica" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CantidadPresentacion" class="control-label"></label>
-                <input asp-for="CantidadPresentacion" class="form-control" />
-                <span asp-validation-for="CantidadPresentacion" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CodigoBarras" class="control-label"></label>
-                <input asp-for="CodigoBarras" class="form-control" />
-                <span asp-validation-for="CodigoBarras" class="text-danger"></span>
-            </div>
-          
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="Activo" /> @Html.DisplayNameFor(model => model.Activo)
-                </label>
-            </div>
-            <div class="form-group">
-                <label asp-for="DrogaId" class="control-label"></label>
-                <select asp-for="DrogaId" class ="form-control" asp-items="ViewBag.Drogas"></select>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+<div class="container my-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0"><i class="bi bi-plus-circle"></i> Nuevo Producto</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" autocomplete="off">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="NombreComercial" class="form-label"></label>
+                        <input asp-for="NombreComercial" class="form-control" />
+                        <span asp-validation-for="NombreComercial" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Laboratorio" class="form-label"></label>
+                        <input asp-for="Laboratorio" class="form-control" />
+                        <span asp-validation-for="Laboratorio" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="FormaFarmaceutica" class="form-label"></label>
+                        <input asp-for="FormaFarmaceutica" class="form-control" />
+                        <span asp-validation-for="FormaFarmaceutica" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="CantidadPresentacion" class="form-label"></label>
+                        <input asp-for="CantidadPresentacion" class="form-control" />
+                        <span asp-validation-for="CantidadPresentacion" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="CodigoBarras" class="form-label"></label>
+                        <input asp-for="CodigoBarras" class="form-control" />
+                        <span asp-validation-for="CodigoBarras" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="DrogaId" class="form-label"></label>
+                        <select asp-for="DrogaId" class="form-select" asp-items="ViewBag.Drogas"></select>
+                        <span asp-validation-for="DrogaId" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 d-flex align-items-center">
+                        <div class="form-check">
+                            <input class="form-check-input" asp-for="Activo" />
+                            <label class="form-check-label" asp-for="Activo"></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end mt-4">
+                    <button type="submit" class="btn btn-lg btn-primary">
+                        <i class="bi bi-check-circle"></i> Guardar
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary ms-2">Volver</a>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {

@@ -18,8 +18,8 @@ namespace Farmacia.Models
         [ForeignKey("ProductoId")]
         public Producto Producto { get; set; }
 
-        //[Column(TypeName = "decimal(18,2)")]
-        //public decimal PrecioCompra { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal PrecioCompra { get; set; }
     }
 
 }

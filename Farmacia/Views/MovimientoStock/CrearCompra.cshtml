@@ -4,57 +4,59 @@
     ViewData["Title"] = "Ingreso de Mercadería";
 }
 
-<h2>Ingreso de Mercadería</h2>
-
-<form asp-action="CrearCompra" method="post">
-    <div class="form-group">
-        <label for="DrogaId">Droga</label>
-        <select id="DrogaId" name="DrogaId" class="form-control" required>
-            <option value="">Seleccione una droga</option>
-            @foreach (var droga in (IEnumerable<SelectListItem>)ViewBag.Drogas)
-            {
-                <option value="@droga.Value">@droga.Text</option>
-            }
-        </select>
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">Ingreso de Mercadería</h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="CrearCompra" method="post" autocomplete="off">
+                    <div class="mb-3">
+                        <label for="DrogaId" class="form-label">Droga</label>
+                        <select id="DrogaId" name="DrogaId" class="form-select" required>
+                            <option value="">Seleccione una droga</option>
+                            @foreach (var droga in (IEnumerable<SelectListItem>)ViewBag.Drogas)
+                            {
+                                <option value="@droga.Value">@droga.Text</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ProductoId" class="form-label">Producto</label>
+                        <select id="ProductoId" name="ProductoId" class="form-select" required>
+                            <option value="">Seleccione un producto</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="Cantidad" class="form-label">Cantidad</label>
+                        <input type="number" name="Cantidad" class="form-control" required min="1" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="CodigoLote" class="form-label">Código de Lote</label>
+                        <input type="text" name="CodigoLote" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="FechaVencimiento" class="form-label">Fecha Vencimiento</label>
+                        <input type="date" name="FechaVencimiento" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="PrecioCompra" class="form-label">Precio de Compra</label>
+                        <input type="number" step="0.01" min="0" name="PrecioCompra" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="Observaciones" class="form-label">Observaciones</label>
+                        <textarea name="Observaciones" class="form-control"></textarea>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-success px-4">Guardar</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">Volver</a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-
-    <div class="form-group">
-        <label for="ProductoId">Producto</label>
-        <select id="ProductoId" name="ProductoId" class="form-control" required>
-            <option value="">Seleccione un producto</option>
-        </select>
-    </div>
-
-    <div class="form-group">
-        <label for="Cantidad">Cantidad</label>
-        <input type="number" name="Cantidad" class="form-control" required min="1" />
-    </div>
-
-    <div class="form-group">
-        <label for="CodigoLote">Código de Lote</label>
-        <input type="text" name="CodigoLote" class="form-control" required />
-    </div>
-
-
-    <div class="form-group">
-        <label for="FechaVencimiento">Fecha Vencimiento</label>
-         <input type="date" name="FechaVencimiento" class="form-control" required /> 
-      
-    </div>
-
-    <div class="form-group">
-        <label for="PrecioCompra">Precio de Compra</label>
-        <input type="number" step="0.01" min="0" name="PrecioCompra" class="form-control" required />
-    </div>
-
-    <div class="form-group">
-        <label for="Observaciones">Observaciones</label>
-        <textarea name="Observaciones" class="form-control"></textarea>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Guardar</button>
-</form>
-
+</div>
 
 @section Scripts {
     <script>

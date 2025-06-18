@@ -1,0 +1,62 @@
+﻿@model Farmacia.Models.MovimientoStock
+
+@{
+    ViewData["Title"] = "Detalle de Movimiento de Stock";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">Detalle de Movimiento de Stock</h4>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">Fecha</dt>
+                    <dd class="col-sm-7">@Model.Fecha.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                    <dt class="col-sm-5">Tipo de Movimiento</dt>
+                    <dd class="col-sm-7">@Model.TipoMovimiento</dd>
+
+                    <dt class="col-sm-5">Droga</dt>
+                    <dd class="col-sm-7">@Model.Droga?.NombreCompleto</dd>
+
+                    <dt class="col-sm-5">Producto</dt>
+                    <dd class="col-sm-7">@Model.Producto?.NombreComercial @Model.Producto?.PresentacionCompleta</dd>
+
+                    <dt class="col-sm-5">Cantidad</dt>
+                    <dd class="col-sm-7">@Model.Cantidad</dd>
+
+                    <dt class="col-sm-5">Código Lote</dt>
+                    <dd class="col-sm-7">@Model.CodigoLote</dd>
+
+                    <dt class="col-sm-5">Fecha de Vencimiento</dt>
+                    <dd class="col-sm-7">
+                        @(Model.Lote != null ? Model.Lote.FechaVencimiento.ToString("dd/MM/yyyy") : (Model.FechaVencimiento != default ? Model.FechaVencimiento.ToString("dd/MM/yyyy") : "-"))
+                    </dd>
+
+                    <dt class="col-sm-5">Precio de Compra</dt>
+                    <dd class="col-sm-7">
+                        @if (Model.PrecioCompra > 0)
+                        {
+                            @($"${Model.PrecioCompra:N2}")
+                        }
+                        else
+                        {
+                            <span class="text-muted">-</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-5">Usuario</dt>
+                    <dd class="col-sm-7">@Model.Usuario?.UserName</dd>
+
+                    <dt class="col-sm-5">Observaciones</dt>
+                    <dd class="col-sm-7">@Model.Observaciones</dd>
+                </dl>
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="Index" class="btn btn-outline-secondary">Volver al listado</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

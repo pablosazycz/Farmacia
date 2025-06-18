@@ -17,7 +17,8 @@ namespace Farmacia.Services
         public async Task<Droga> CrearDrogaAsync(Droga droga)
         {
             try
-            {   droga.FechaAlta = DateTime.Now;
+            {
+                droga.FechaAlta = DateTime.Now;
                 droga.Activo = true;
                 _context.Drogas.Add(droga);
                 await _context.SaveChangesAsync();
@@ -75,8 +76,8 @@ namespace Farmacia.Services
 
         public async Task<Droga> ObtenerDrogaPorIdAsync(int id)
         {
-          return await _context.Drogas.FindAsync(id);
-            
+            return await _context.Drogas.FindAsync(id);
+
         }
 
         public async Task<List<Droga>> ObtenerDrogasAsync()
@@ -84,13 +85,13 @@ namespace Farmacia.Services
             return await _context.Drogas.ToListAsync();
         }
 
-             
+
 
         public async Task<List<Droga>> ObtenerDrogasPorNombreAsync(string nombre)
         {
             return await _context.Drogas
           .Where(d => d.Nombre.Contains(nombre) && d.Activo)
-          .ToListAsync();   
+          .ToListAsync();
         }
 
         public async Task<List<Droga>> ObtenerDrogasPorRequiereRecetaAsync(bool requiereReceta)
@@ -107,6 +108,27 @@ namespace Farmacia.Services
                 .ToListAsync();
         }
 
+        public async Task<List<Droga>> BuscarDrogasAsync(string term)
+        {
+            if (string.IsNullOrWhiteSpace(term))
+                return new List<Droga>();
 
+            // Filtra en SQL solo por campos mapeados
+            var query = _context.Drogas
+                .Where(d => d.Nombre.Contains(term) && d.Activo)
+                .OrderBy(d => d.Nombre)
+                .Take(50); // Trae más para filtrar luego
+
+            var drogas = await query.ToListAsync();
+
+            // Ahora filtra en memoria por NombreCompleto
+            return drogas
+                .Where(d =>
+                    d.Nombre.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                    (!string.IsNullOrEmpty(d.NombreCompleto) && d.NombreCompleto.Contains(term, StringComparison.OrdinalIgnoreCase))
+                )
+                .Take(20)
+                .ToList();
+        }
     }
 }

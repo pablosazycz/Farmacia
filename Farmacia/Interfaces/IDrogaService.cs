@@ -12,7 +12,7 @@ namespace Farmacia.Interfaces
         Task<List<Droga>> ObtenerDrogasPorNombreAsync(string nombre);
         Task<List<Droga>> ObtenerDrogasPorRequiereRecetaAsync(bool requiereReceta);
         Task<List<Droga>> ObtenerDrogasActivasAsync();
-
+        Task<List<Droga>> BuscarDrogasAsync(string term);
 
     }
 }

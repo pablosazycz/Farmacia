@@ -5,46 +5,74 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>@ViewData["Title"]</h1>
-<h3>@ViewData["Droga"]</h3>
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">@ViewData["Title"]</h4>
+                <span class="fw-bold">@ViewData["Droga"]</span>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle" id="tablaProductosDroga">
+                        <thead class="table-success">
+                            <tr>
+                                <th>@Html.DisplayNameFor(model => model.NombreComercial)</th>
+                                <th>@Html.DisplayNameFor(model => model.CantidadPresentacion)</th>
+                                <th>Stock</th>
+                                <th>@Html.DisplayNameFor(model => model.CodigoBarras)</th>
+                                <th>@Html.DisplayNameFor(model => model.Activo)</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@Html.DisplayFor(modelItem => item.NombreComercial)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.PresentacionCompleta)</td>
+                                        <td>
+                                            @(item.Lotes != null ? item.Lotes.Sum(l => l.Cantidad) : 0)
+                                        </td>
+                                        <td>@Html.DisplayFor(modelItem => item.CodigoBarras)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.Activo)</td>
+                                        <td class="text-center">
+                                            <a asp-controller="Productos" asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm me-1">Detalles</a>
+                                            <a asp-controller="Productos" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm me-1">Editar</a>
+                                            <a asp-controller="Productos" asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Eliminar</a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="6" class="text-center">No hay productos disponibles.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-3">
+                    <a asp-action="Index" class="btn btn-outline-secondary">Volver a Drogas</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-
-            <th>@Html.DisplayNameFor(model => model.NombreComercial)</th>
-            <th>@Html.DisplayNameFor(model => model.CantidadPresentacion)</th>
-            <th> @Html.DisplayNameFor(model => model.CodigoBarras)</th>
-            <th>
-                @Html.DisplayNameFor(model => model.Activo)
-            </th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Model != null && Model.Any())
-        {
-            foreach (Producto item in Model)
-            {
-                <tr>
-
-                    <td>@Html.DisplayFor(modelItem => item.NombreComercial)</td>
-                    <td>@Html.DisplayFor(modelItem => item.CantidadPresentacion)</td>
-                    <td>@Html.DisplayFor(modelItem => item.CodigoBarras)</td>
-                    <td>@Html.DisplayFor(modelItem => item.Activo)</td>
-                    <td>
-                        <a asp-controller="Productos" asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Detalles</a>
-                        <a asp-controller="Productos" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Editar</a>
-                        <a asp-controller="Productos" asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Eliminar</a>
-                    </td>
-                </tr>
-            }
-        }
-        else
-        {
-            <tr>
-                <td colspan="5" class="text-center">No hay productos disponibles.</td>
-            </tr>
-        }
-    </tbody>
-</table>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#tablaProductosDroga').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                },
+                pageLength: 10,
+                order: [[0, 'asc']]
+            });
+        });
+    </script>
+}

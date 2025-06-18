@@ -10,25 +10,30 @@ namespace Farmacia.Services
     {
         private readonly IDrogaService _drogaService;
         private readonly IProductoService _productoService;
-        private readonly ILoteService _loteService;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _UserManager;
 
         public MovimientoStockService(
             IDrogaService drogaService,
             IProductoService productoService,
-            ILoteService loteService,
             ApplicationDbContext context,
             UserManager<IdentityUser> userManager)
         {
             _drogaService = drogaService;
             _productoService = productoService;
-            _loteService = loteService;
             _context = context;
             userManager = _UserManager;
 
         }
-
+        public async Task<MovimientoStock?> ObtenerPorIdAsync(int id)
+        {
+            return await _context.MovimientosStock
+                .Include(m => m.Droga)
+                .Include(m => m.Producto)
+                .Include(m => m.Lote)
+                .Include(m => m.Usuario)
+                .FirstOrDefaultAsync(m => m.Id == id);
+        }
         //public async Task<MovimientoStock> CrearMovimientoAsync(MovimientoStock movimiento)
         //{
 
@@ -166,10 +171,18 @@ namespace Farmacia.Services
                             CodigoLote = movimiento.CodigoLote,
                             FechaVencimiento = movimiento.FechaVencimiento,
                             Cantidad = movimiento.Cantidad,
-                            ProductoId = (int)movimiento.ProductoId
+                            ProductoId = (int)movimiento.ProductoId,
+                            PrecioCompra = movimiento.PrecioCompra
                         };
                         _context.Lotes.Add(nuevoLote);
                         await _context.SaveChangesAsync(); // para obtener el Id
+
+                        decimal porcentajeGanancia = 0.30m; // 30%
+                        producto.PrecioUnitario = Math.Round(nuevoLote.PrecioCompra * (1 + porcentajeGanancia), 2);
+                        if (movimiento.PrecioCompra <= 0)
+                            throw new ArgumentException("El precio de compra debe ser mayor a cero.");
+                        _context.Productos.Update(producto);
+                        await _context.SaveChangesAsync();
 
                         movimiento.Lote = nuevoLote;
                         movimiento.LoteId = nuevoLote.Id;
@@ -182,7 +195,7 @@ namespace Farmacia.Services
                         movimiento.LoteId = loteExistente.Id;
                     }
                     int unidades = movimiento.Cantidad * producto.CantidadPresentacion;
-                    droga.Stock +=unidades;
+                    droga.Stock += unidades;
                     _context.Drogas.Update(droga);
                     break;
 
@@ -204,6 +217,22 @@ namespace Farmacia.Services
                     _context.Drogas.Update(droga);
                     break;
 
+                case TipoMovimiento.BajaPorVencimiento:
+
+                    if (loteExistente == null)
+                        throw new ArgumentException("El lote especificado no existe para dar de baja por vencimiento.");
+                    if (loteExistente.FechaVencimiento >= DateTime.Now)
+                        throw new ArgumentException("El lote no está vencido.");
+                    if (loteExistente.Cantidad < movimiento.Cantidad)
+                        throw new ArgumentException("No hay suficiente cantidad en el lote para dar de baja por vencimiento.");
+                    loteExistente.Cantidad -= movimiento.Cantidad;
+                    _context.Lotes.Update(loteExistente);
+                    movimiento.Lote = loteExistente;
+                    movimiento.LoteId = loteExistente.Id;
+                    int unidadesBaja = movimiento.Cantidad * producto.CantidadPresentacion;
+                    droga.Stock -= unidadesBaja;
+                    _context.Drogas.Update(droga);
+                    break;
 
                 default:
                     throw new ArgumentException("Tipo de movimiento inválido.");
@@ -214,7 +243,7 @@ namespace Farmacia.Services
 
             return movimiento;
         }
-            
+
 
         public async Task<List<MovimientoStock>> ObtenerMovimientosPorDrogaIdAsync(int drogaId)
         {
@@ -248,8 +277,8 @@ namespace Farmacia.Services
             return await _context.MovimientosStock
                         .Include(m => m.Droga)
                         .Include(m => m.Lote)
-                        .Include(m=>m.Usuario)
-                        .Include(m=>m.Producto)
+                        .Include(m => m.Usuario)
+                        .Include(m => m.Producto)
                         .ToListAsync();
         }
     }

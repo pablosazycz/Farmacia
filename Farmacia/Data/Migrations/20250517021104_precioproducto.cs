@@ -17,15 +17,15 @@ namespace Farmacia.Data.Migrations
                 nullable: false,
                 defaultValue: 0m);
 
-       
 
-         
+
+
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-           
+
             migrationBuilder.DropColumn(
                 name: "PrecioUnitario",
                 table: "Productos");

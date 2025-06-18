@@ -1,0 +1,51 @@
+﻿@model IEnumerable<Farmacia.Models.Lote>
+
+@{
+    ViewData["Title"] = "Vencimiento en 30 días";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-header bg-warning text-dark d-flex align-items-center">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <h4 class="mb-0">Productos próximos a vencer (30 días)</h4>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped align-middle" id="tablaProximos">
+                    <thead class="table-warning">
+                        <tr>
+                            <th>Medicamento</th>
+                            <th>Lote</th>
+                            <th>Fecha de Vencimiento</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var lote in Model)
+                        {
+                            <tr>
+                                <td>@lote?.Producto?.NombreComercial</td>
+                                <td>@lote?.CodigoLote</td>
+                                <td>@lote?.FechaVencimiento.ToString("dd/MM/yyyy")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#tablaProximos').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                },
+                pageLength: 10,
+                order: [[2, 'asc']]
+            });
+        });
+    </script>
+}
