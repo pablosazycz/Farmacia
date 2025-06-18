@@ -44,10 +44,10 @@ namespace Farmacia.Tests.Test
                 ClienteId = 1,
                 UsuarioId = "usuario1",
                 DetallesVenta = new List<DetalleVenta>
-            {
-                new DetalleVenta { Cantidad = 2, PrecioUnitario = 100, Subtotal = 200, ProductoId = 1 },
-                new DetalleVenta { Cantidad = 1, PrecioUnitario = 50, Subtotal = 50, ProductoId = 2 }
-            }
+                {
+                    new DetalleVenta { Cantidad = 2, PrecioUnitario = 100, Subtotal = 200, ProductoId = 1, CodigoLote = "L1" },
+                    new DetalleVenta { Cantidad = 1, PrecioUnitario = 50, Subtotal = 50, ProductoId = 2, CodigoLote = "L2" }
+                }
             };
 
             var resultado = await service.CrearVentaAsync(venta);
