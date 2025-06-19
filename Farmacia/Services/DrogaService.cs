@@ -18,6 +18,15 @@ namespace Farmacia.Services
         {
             try
             {
+                bool existe = await _context.Drogas.AnyAsync(d =>
+                                d.Nombre.ToLower() == droga.Nombre.ToLower() &&
+                                d.Concentracion.ToLower() == droga.Concentracion.ToLower() &&
+                                d.Activo);
+
+                if (existe)
+                {
+                    throw new InvalidOperationException("Ya existe una droga activa con ese nombre y concentración.");
+                }
                 droga.FechaAlta = DateTime.Now;
                 droga.Activo = true;
                 _context.Drogas.Add(droga);
@@ -38,6 +47,16 @@ namespace Farmacia.Services
                 if (droga.Activo == true)
                 {
                     droga.FechaBaja = null;
+                }
+
+                bool existe = await _context.Drogas.AnyAsync(d =>
+                               d.Nombre.ToLower() == droga.Nombre.ToLower() &&
+                               d.Concentracion.ToLower() == droga.Concentracion.ToLower() &&
+                               d.Activo);
+
+                if (existe)
+                {
+                    throw new InvalidOperationException("Ya existe una droga activa con ese nombre y concentración.");
                 }
 
                 _context.Drogas.Update(droga);

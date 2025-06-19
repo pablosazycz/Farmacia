@@ -64,8 +64,19 @@ namespace Farmacia.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _clienteService.CrearClienteAsync(cliente);
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    await _clienteService.CrearClienteAsync(cliente);
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (InvalidOperationException ex)
+                {
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                }
+                catch (Exception)
+                {
+                    ModelState.AddModelError(string.Empty, "Ocurrió un error inesperado.");
+                }
             }
             return View(cliente);
         }
@@ -84,13 +95,25 @@ namespace Farmacia.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Cliente cliente)
         {
+
             if (id != cliente.Id)
                 return BadRequest();
 
             if (ModelState.IsValid)
             {
-                await _clienteService.EditarClienteAsync(cliente);
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    await _clienteService.EditarClienteAsync(cliente);
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (InvalidOperationException ex)
+                {
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                }
+                catch (Exception)
+                {
+                    ModelState.AddModelError(string.Empty, "Ocurrió un error inesperado.");
+                }
             }
             return View(cliente);
         }

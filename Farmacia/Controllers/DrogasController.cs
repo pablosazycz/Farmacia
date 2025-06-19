@@ -57,8 +57,20 @@ namespace Farmacia.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _drogaService.CrearDrogaAsync(droga);
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    await _drogaService.CrearDrogaAsync(droga);
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (InvalidOperationException ex)
+                {
+                    // Agrega el mensaje de error a ModelState para mostrarlo en la vista
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                }
+                catch (Exception)
+                {
+                    ModelState.AddModelError(string.Empty, "Ocurrió un error inesperado.");
+                }
             }
             return View(droga);
         }
@@ -92,8 +104,20 @@ namespace Farmacia.Controllers
 
             if (ModelState.IsValid)
             {
-                await _drogaService.EditarDrogaAsync(droga);
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    await _drogaService.EditarDrogaAsync(droga);
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (InvalidOperationException ex)
+                {
+                    // Agrega el mensaje de error a ModelState para mostrarlo en la vista
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                }
+                catch (Exception)
+                {
+                    ModelState.AddModelError(string.Empty, "Ocurrió un error inesperado.");
+                }
             }
 
             return View(droga);

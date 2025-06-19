@@ -8,29 +8,67 @@
     <div class="col-md-8 col-lg-6">
         <div class="card shadow-sm border-0 mt-4">
             <div class="card-header bg-success text-white">
-                <h4 class="mb-0">Detalle de Droga Genérica</h4>
+                <h4 class="mb-0"><i class="bi bi-capsule"></i> Detalle de Droga Genérica</h4>
             </div>
             <div class="card-body">
-                <dl class="row mb-0">
-                    <dt class="col-sm-4">Nombre</dt>
-                    <dd class="col-sm-8">@Html.DisplayFor(model => model.Nombre)</dd>
-                    <dt class="col-sm-4">Concentración</dt>
-                    <dd class="col-sm-8">@Html.DisplayFor(model => model.Concentracion)</dd>
-                    <dt class="col-sm-4">Stock</dt>
-                    <dd class="col-sm-8">@Html.DisplayFor(model => model.Stock)</dd>
-                    <dt class="col-sm-4">Stock Mínimo</dt>
-                    <dd class="col-sm-8">@Html.DisplayFor(model => model.StockMinimo)</dd>
-                    <dt class="col-sm-4">Stock Máximo</dt>
-                    <dd class="col-sm-8">@Html.DisplayFor(model => model.StockMaximo)</dd>
-                    <dt class="col-sm-4">Requiere Receta</dt>
-                    <dd class="col-sm-8">@Html.DisplayFor(model => model.RequiereReceta)</dd>
-                    <dt class="col-sm-4">Activo</dt>
-                    <dd class="col-sm-8">@Html.DisplayFor(model => model.Activo)</dd>
-                    <dt class="col-sm-4">Fecha Alta</dt>
-                    <dd class="col-sm-8">@Html.DisplayFor(model => model.FechaAlta)</dd>
-                    <dt class="col-sm-4">Fecha Baja</dt>
-                    <dd class="col-sm-8">@Html.DisplayFor(model => model.FechaBaja)</dd>
-                </dl>
+                <table class="table table-borderless mb-0">
+                    <tbody>
+                        <tr>
+                            <th class="w-50 text-end">Nombre</th>
+                            <td>@Model.Nombre</td>
+                        </tr>
+                        <tr>
+                            <th class="text-end">Concentración</th>
+                            <td>@Model.Concentracion</td>
+                        </tr>
+                        <tr>
+                            <th class="text-end">Stock</th>
+                            <td>@Model.Stock</td>
+                        </tr>
+                        <tr>
+                            <th class="text-end">Stock Mínimo</th>
+                            <td>@Model.StockMinimo</td>
+                        </tr>
+                        <tr>
+                            <th class="text-end">Stock Máximo</th>
+                            <td>@Model.StockMaximo</td>
+                        </tr>
+                        <tr>
+                            <th class="text-end">Requiere Receta</th>
+                            <td>
+                                @if (Model.RequiereReceta)
+                                {
+                                    <span class="badge bg-warning text-dark">Sí</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">No</span>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-end">Activo</th>
+                            <td>
+                                @if (Model.Activo)
+                                {
+                                    <span class="badge bg-success">Sí</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">No</span>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-end">Fecha Alta</th>
+                            <td>@(Model.FechaAlta?.ToString("dd/MM/yyyy") ?? "-")</td>
+                        </tr>
+                        <tr>
+                            <th class="text-end">Fecha Baja</th>
+                            <td>@(Model.FechaBaja?.ToString("dd/MM/yyyy") ?? "-")</td>
+                        </tr>
+                    </tbody>
+                </table>
                 <div class="d-flex justify-content-between mt-4">
                     <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-warning">Editar</a>
                     <a asp-action="Index" class="btn btn-outline-secondary">Volver al listado</a>

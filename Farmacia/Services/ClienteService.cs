@@ -41,13 +41,27 @@ namespace Farmacia.Services
         }
 
         public async Task CrearClienteAsync(Cliente cliente)
+
         {
+
+            bool existe = await _context.Clientes
+                .AnyAsync(c => c.Dni == cliente.Dni);
+
+            if (existe)
+                throw new InvalidOperationException("Ya existe un cliente con ese DNI.");
+
             _context.Clientes.Add(cliente);
             await _context.SaveChangesAsync();
         }
 
         public async Task EditarClienteAsync(Cliente cliente)
         {
+            bool existe = await _context.Clientes
+        .AnyAsync(c => c.Dni == cliente.Dni && c.Id != cliente.Id);
+
+            if (existe)
+                throw new InvalidOperationException("Ya existe un cliente con ese DNI.");
+
             _context.Clientes.Update(cliente);
             await _context.SaveChangesAsync();
         }
