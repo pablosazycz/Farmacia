@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace Farmacia.Controllers
 {
-    // [Authorize]
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -83,7 +83,7 @@ namespace Farmacia.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> DarDeBajaTodos()
         {
             var usuarioId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -96,7 +96,7 @@ namespace Farmacia.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> DarDeBajaUno(int loteId)
         {
             var usuarioId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -122,12 +122,6 @@ namespace Farmacia.Controllers
             }
         }
 
-
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

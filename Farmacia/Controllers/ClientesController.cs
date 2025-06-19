@@ -1,9 +1,11 @@
 ﻿using Farmacia.Interfaces;
 using Farmacia.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Farmacia.Controllers
 {
+    [Authorize]
     public class ClientesController : Controller
     {
         private readonly IClienteService _clienteService;

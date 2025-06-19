@@ -1,10 +1,12 @@
 ﻿using Farmacia.Interfaces;
 using Farmacia.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Farmacia.Controllers
 {
+    [Authorize]
     public class ProductosController : Controller
     {
 
@@ -63,6 +65,7 @@ namespace Farmacia.Controllers
         }
 
         // GET: Productos/Create
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Create()
         {
             List<Droga> drogas = await _drogaService.ObtenerDrogasActivasAsync();
@@ -74,6 +77,7 @@ namespace Farmacia.Controllers
         // POST: Productos/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Producto producto)
@@ -91,6 +95,7 @@ namespace Farmacia.Controllers
         }
 
         // GET: Productos/Edit/5
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -107,6 +112,7 @@ namespace Farmacia.Controllers
         // POST: Productos/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Producto producto)
@@ -126,6 +132,7 @@ namespace Farmacia.Controllers
         }
 
         // GET: Productos/Delete/5
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -137,6 +144,7 @@ namespace Farmacia.Controllers
         }
 
         // POST: Productos/Delete/5
+        [Authorize(Roles = "Administrador")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

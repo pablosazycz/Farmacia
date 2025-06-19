@@ -1,9 +1,11 @@
 ﻿using Farmacia.Interfaces;
 using Farmacia.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Farmacia.Controllers
 {
+    [Authorize]
     public class PromocionesController : Controller
     {
         private readonly IPromocionService _promocionService;
@@ -26,11 +28,12 @@ namespace Farmacia.Controllers
             return View(promocion);
         }
 
+        [Authorize(Roles = "Administrador")]
         public IActionResult Create()
         {
             return View();
         }
-
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Promocion promocion)
@@ -46,14 +49,14 @@ namespace Farmacia.Controllers
             }
             return View(promocion);
         }
-
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Edit(int id)
         {
             var promocion = await _promocionService.ObtenerPromocionPorIdAsync(id);
             if (promocion == null) return NotFound();
             return View(promocion);
         }
-
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Promocion promocion)
@@ -70,14 +73,14 @@ namespace Farmacia.Controllers
             }
             return View(promocion);
         }
-
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Delete(int id)
         {
             var promocion = await _promocionService.ObtenerPromocionPorIdAsync(id);
             if (promocion == null) return NotFound();
             return View(promocion);
         }
-
+        [Authorize(Roles = "Administrador")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

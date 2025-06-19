@@ -1,11 +1,13 @@
 ﻿using Farmacia.Data;
 using Farmacia.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace Farmacia.Controllers
 {
+    [Authorize]
     public class LotesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -66,6 +68,7 @@ namespace Farmacia.Controllers
         }
 
         // GET: Lotes/Edit/5
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -85,6 +88,7 @@ namespace Farmacia.Controllers
         // POST: Lotes/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,CodigoLote,FechaVencimiento,Cantidad,ProductoId")] Lote lote)
@@ -119,6 +123,7 @@ namespace Farmacia.Controllers
         }
 
         // GET: Lotes/Delete/5
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -138,6 +143,7 @@ namespace Farmacia.Controllers
         }
 
         // POST: Lotes/Delete/5
+        [Authorize(Roles = "Administrador")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

@@ -1,6 +1,7 @@
 ﻿using Farmacia.Data;
 using Farmacia.Interfaces;
 using Farmacia.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -8,6 +9,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Farmacia.Controllers
 {
+
+    [Authorize]
     public class MovimientoStockController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -131,12 +134,14 @@ namespace Farmacia.Controllers
 
 
         // GET: MovimientoStock/Edit/5
+        [Authorize(Roles = "Administrador")]
         public ActionResult Edit(int id)
         {
             return View();
         }
 
         // POST: MovimientoStock/Edit/5
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, IFormCollection collection)
@@ -152,12 +157,14 @@ namespace Farmacia.Controllers
         }
 
         // GET: MovimientoStock/Delete/5
+        [Authorize(Roles = "Administrador")]
         public ActionResult Delete(int id)
         {
             return View();
         }
 
         // POST: MovimientoStock/Delete/5
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)

@@ -41,6 +41,7 @@ namespace Farmacia.Controllers
         }
 
         // GET: Drogas/Create
+        [Authorize(Roles = "Administrador")]
         public IActionResult Create()
         {
             return View();
@@ -49,6 +50,7 @@ namespace Farmacia.Controllers
         // POST: Drogas/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Droga droga)
@@ -62,6 +64,7 @@ namespace Farmacia.Controllers
         }
 
         // GET: Drogas/Edit/5
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -79,6 +82,7 @@ namespace Farmacia.Controllers
         // POST: Drogas/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Droga droga)
@@ -96,6 +100,7 @@ namespace Farmacia.Controllers
         }
 
         // GET: Drogas/Delete/5
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -111,6 +116,7 @@ namespace Farmacia.Controllers
         }
 
         // POST: Drogas/Delete/5
+        [Authorize(Roles = "Administrador")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
