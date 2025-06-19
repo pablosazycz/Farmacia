@@ -70,7 +70,7 @@ namespace Farmacia.Tests.Test
 
         // Eliminar Venta
         [Fact]
-        public async Task DeleteConfirmed_EliminaVentaYRedirige()
+        public async Task EliminarVentaYRedirigir()
         {
             var mockVentaService = new Mock<IVentaService>();
             mockVentaService.Setup(s => s.EliminarVentaAsync(1)).ReturnsAsync(true);

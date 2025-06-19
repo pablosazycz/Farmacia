@@ -15,7 +15,7 @@ namespace Farmacia.Tests.Test
     {
         // Ver promociones
         [Fact]
-        public async Task Index_ReturnsViewWithPromociones()
+        public async Task VerPromociones()
         {
             var mockService = new Mock<IPromocionService>();
             mockService.Setup(s => s.ObtenerPromocionesAsync())
@@ -33,7 +33,7 @@ namespace Farmacia.Tests.Test
 
         // Detalles promo existente
         [Fact]
-        public async Task Details_PromocionExists_ReturnsViewWithPromocion()
+        public async Task DetallesPromo_ConVista()
         {
             var promo = new Promocion { Id = 2, Nombre = "Promo2" };
             var mockService = new Mock<IPromocionService>();
@@ -49,7 +49,7 @@ namespace Farmacia.Tests.Test
 
         // Crear promoción
         [Fact]
-        public async Task Create_ValidModel_RedirectsToIndex()
+        public async Task CrearPromoYRedirigir()
         {
             var mockService = new Mock<IPromocionService>();
             var controller = new PromocionesController(mockService.Object);
@@ -64,7 +64,7 @@ namespace Farmacia.Tests.Test
 
         // Editar promoción
         [Fact]
-        public async Task Edit_ValidModel_RedirectsToIndex()
+        public async Task EditarPromoYRedirigir()
         {
             var mockService = new Mock<IPromocionService>();
             var controller = new PromocionesController(mockService.Object);
@@ -79,7 +79,7 @@ namespace Farmacia.Tests.Test
 
         // Eliminar promoción
         [Fact]
-        public async Task DeleteConfirmed_DeletesAndRedirects()
+        public async Task EliminarPromoYRedirigir()
         {
             var mockService = new Mock<IPromocionService>();
             var controller = new PromocionesController(mockService.Object);
