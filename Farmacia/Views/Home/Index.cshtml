@@ -129,6 +129,36 @@
                 </div>
             </div>
         </div>
+        <div class="col">
+            <div class="card h-100 text-center shadow border-0">
+                <div class="card-body">
+                    <a asp-controller="Home" asp-action="Vencidos" class="btn btn-danger btn-lg w-100 py-3">
+                        <i class="bi bi-x-octagon display-5 mb-2"></i><br />
+                        Vencidos
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 text-center shadow border-0">
+                <div class="card-body">
+                    <a asp-controller="Home" asp-action="ProxAVencer" class="btn btn-warning btn-lg w-100 py-3 text-dark">
+                        <i class="bi bi-exclamation-triangle display-5 mb-2"></i><br />
+                        Próx. a Vencer
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 text-center shadow border-0">
+                <div class="card-body">
+                    <a asp-controller="Home" asp-action="StockCritico" class="btn btn-info btn-lg w-100 py-3 text-dark">
+                        <i class="bi bi-exclamation-circle display-5 mb-2"></i><br />
+                        Stock Crítico
+                    </a>
+                </div>
+            </div>
+        </div>
         @if (User.IsInRole("Administrador"))
         {
             <div class="col">

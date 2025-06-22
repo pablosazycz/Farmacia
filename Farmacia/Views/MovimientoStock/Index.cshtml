@@ -10,10 +10,21 @@
             <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
                 <h4 class="mb-0">@ViewData["Title"]</h4>
                 <div>
-                    <a class="btn btn-light text-success fw-bold me-2" asp-controller="MovimientoStock" asp-action="CrearCompra">
-                        <i class="bi bi-box-arrow-in-down"></i> Ingresar Mercadería
+                    <a class="btn btn-light btn-sm text-success fw-bold me-2" asp-controller="MovimientoStock" asp-action="CrearCompra">
+                        <i class="bi bi-plus-circle"></i> Ingresar Mercadería
                     </a>
-                   
+                    <a class="btn btn-light btn-sm text-success fw-bold me-2" asp-controller="MovimientoStock" asp-action="ReporteVentasPorProducto">
+                        <i class="bi bi-bar-chart-line"></i> Venta por productos
+                    </a>
+                    <a class="btn btn-light btn-sm text-success fw-bold me-2" asp-controller="MovimientoStock" asp-action="AltaRotacion">
+                        <i class="bi bi-arrow-repeat"></i> Alta Rotacion
+                    </a>
+                    <a class="btn btn-light btn-sm text-success fw-bold me-2" asp-controller="MovimientoStock" asp-action="SugerenciasPromocion">
+                        <i class="bi bi-lightbulb"></i> Sug Promocion
+                    </a>
+                    <a class="btn btn-light btn-sm text-success fw-bold me-2" asp-controller="MovimientoStock" asp-action="SugerenciasReposicion">
+                        <i class="bi bi-arrow-up-circle"></i> Sug Reposicion
+                    </a>
                 </div>
             </div>
             <div class="card-body">
